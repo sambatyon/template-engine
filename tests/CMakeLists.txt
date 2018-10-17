@@ -1,9 +1,12 @@
 include_directories(
-  ../include
+  ${CMAKE_CURRENT_SOURCE_DIR}/../include
+  ${CMAKE_CURRENT_SOURCE_DIR}/../src
 )
 
 add_executable(${PROJECT_PREFIX}-tests
   test_main.cc
+  lexer_tests.hh
+  lexer_tests.cc
 )
 
 target_link_libraries(${PROJECT_PREFIX}-tests yate)
