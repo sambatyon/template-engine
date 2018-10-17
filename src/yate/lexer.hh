@@ -16,10 +16,15 @@ class Lexer {
 
  private:
   std::istream::char_type ReadChar();
+  std::istream::char_type ReadCompare(std::istream::char_type ch);
+
+  Token ScanLiterate();
+  Token ScanScript();
 
   std::istream &istream_;
   std::istream::char_type current_;
   bool script_mode_;
+  bool initialized_; // TODO: Find a more elegant solution to this.
 };
 
 } // yate

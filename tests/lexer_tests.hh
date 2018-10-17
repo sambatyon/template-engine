@@ -3,4 +3,5 @@
 struct LexerTests {
   int RunTests();
   int TestLiterateOnly();
+  int TestMultiTokenInput();
 };
