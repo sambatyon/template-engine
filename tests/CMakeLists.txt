@@ -7,6 +7,8 @@ add_executable(${PROJECT_PREFIX}-tests
   test_main.cc
   lexer_tests.hh
   lexer_tests.cc
+  render_tests.hh
+  render_tests.cc
 )
 
 target_link_libraries(${PROJECT_PREFIX}-tests yate)

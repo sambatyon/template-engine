@@ -1,5 +1,7 @@
 #pragma once
 
+#include "lexer.hh"
+
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -8,7 +10,6 @@
 namespace yate {
 
 class Frame;
-class Lexer;
 class Token;
 
 class Renderer {
