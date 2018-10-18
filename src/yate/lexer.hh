@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <iosfwd>
 #include <istream>
 
@@ -25,6 +26,8 @@ class Lexer {
   std::istream::char_type current_;
   bool script_mode_;
   bool initialized_; // TODO: Find a more elegant solution to this.
+  std::uint64_t id_generator_;
+  bool must_return_script_begin_;
 };
 
 } // yate

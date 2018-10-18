@@ -35,7 +35,7 @@ int LexerTests::TestLiterateOnly() {
 int LexerTests::TestMultiTokenInput() {
   std::stringstream stream(
       "Input {\\{complex{\\this is {{with}} some {{#loop array item}} funny "
-      "{{item}} in it {{/loop}}");
+      "{{item}} in it {{/loop}}{{with}}");
   yate::Lexer lexer(stream);
 
   auto token = lexer.Scan();
@@ -43,16 +43,28 @@ int LexerTests::TestMultiTokenInput() {
   assert(token.value() == "Input {{complex{\\this is ");
 
   token = lexer.Scan();
+  assert(token.tag() == yate::Token::Tag::eScriptBegin);
+  assert(token.value() == "{{");
+
+  token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eIdentifier);
   assert(token.value() == "with");
+
+  token = lexer.Scan();
+  assert(token.tag() == yate::Token::Tag::eScriptEnd);
+  assert(token.value() == "}}");
 
   token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eNoOp);
   assert(token.value() == " some ");
 
   token = lexer.Scan();
+  assert(token.tag() == yate::Token::Tag::eScriptBegin);
+  assert(token.value() == "{{");
+
+  token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eLoopBegin);
-  assert(token.value() == "#loop");
+  assert(token.value() == "#loop0");
 
   token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eIdentifier);
@@ -63,20 +75,52 @@ int LexerTests::TestMultiTokenInput() {
   assert(token.value() == "item");
 
   token = lexer.Scan();
+  assert(token.tag() == yate::Token::Tag::eScriptEnd);
+  assert(token.value() == "}}");
+
+  token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eNoOp);
   assert(token.value() == " funny ");
+
+  token = lexer.Scan();
+  assert(token.tag() == yate::Token::Tag::eScriptBegin);
+  assert(token.value() == "{{");
 
   token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eIdentifier);
   assert(token.value() == "item");
 
   token = lexer.Scan();
+  assert(token.tag() == yate::Token::Tag::eScriptEnd);
+  assert(token.value() == "}}");
+
+  token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eNoOp);
   assert(token.value() == " in it ");
 
   token = lexer.Scan();
+  assert(token.tag() == yate::Token::Tag::eScriptBegin);
+  assert(token.value() == "{{");
+
+  token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eLoopEnd);
   assert(token.value() == "/loop");
+
+  token = lexer.Scan();
+  assert(token.tag() == yate::Token::Tag::eScriptEnd);
+  assert(token.value() == "}}");
+
+  token = lexer.Scan();
+  assert(token.tag() == yate::Token::Tag::eScriptBegin);
+  assert(token.value() == "{{");
+
+  token = lexer.Scan();
+  assert(token.tag() == yate::Token::Tag::eIdentifier);
+  assert(token.value() == "with");
+
+  token = lexer.Scan();
+  assert(token.tag() == yate::Token::Tag::eScriptEnd);
+  assert(token.value() == "}}");
 
   token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eEOF);
@@ -92,6 +136,7 @@ int LexerTests::TestInputValidation() {
     bool error_thrown = false;
     try {
       lexer.Scan();
+      lexer.Scan();
     } catch (const std::runtime_error &e) {
       error_thrown = true;
       assert(e.what() == std::string("EOF found inside script mode."));
@@ -104,6 +149,7 @@ int LexerTests::TestInputValidation() {
     yate::Lexer lexer(stream);
     bool error_thrown = false;
     try {
+      lexer.Scan();
       lexer.Scan();
     } catch (const std::runtime_error &e) {
       error_thrown = true;
@@ -118,6 +164,7 @@ int LexerTests::TestInputValidation() {
     bool error_thrown = false;
     try {
       lexer.Scan();
+      lexer.Scan();
     } catch (const std::runtime_error &e) {
       error_thrown = true;
       assert(e.what() == std::string("Invalid keyword found."));
@@ -130,6 +177,7 @@ int LexerTests::TestInputValidation() {
     yate::Lexer lexer(stream);
     bool error_thrown = false;
     try {
+      lexer.Scan();
       lexer.Scan();
     } catch (const std::runtime_error &e) {
       error_thrown = true;
@@ -144,6 +192,7 @@ int LexerTests::TestInputValidation() {
     bool error_thrown = false;
     try {
       lexer.Scan();
+      lexer.Scan();
     } catch (const std::runtime_error &e) {
       error_thrown = true;
       assert(e.what() == std::string("Invalid keyword found."));
@@ -157,6 +206,7 @@ int LexerTests::TestInputValidation() {
     yate::Lexer lexer(stream);
     bool error_thrown = false;
     try {
+      lexer.Scan();
       lexer.Scan();
       lexer.Scan();
     } catch (const std::runtime_error &e) {

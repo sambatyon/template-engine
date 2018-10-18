@@ -5,8 +5,12 @@
 namespace yate {
 
 Lexer::Lexer(std::istream &istream)
-    : istream_(istream), current_(), script_mode_(false), initialized_(false) {
-}
+    : istream_(istream),
+      current_(),
+      script_mode_(false),
+      initialized_(false),
+      id_generator_(0),
+      must_return_script_begin_(false) {}
 
 std::istream::char_type Lexer::ReadChar() {
   istream_.get(current_);
@@ -37,6 +41,10 @@ Token Lexer::Scan() {
 }
 
 Token Lexer::ScanScript() {
+  if (must_return_script_begin_) {
+    must_return_script_begin_ = false;
+    return Token(Token::Tag::eScriptBegin, "{{");
+  }
   // In script mode we discard all spaces
   while (current_ == ' ' || current_ == '\t') {
     ReadChar();
@@ -49,7 +57,8 @@ Token Lexer::ScanScript() {
       if (std::isalnum(current_)) {
         throw std::runtime_error("Invalid keyword found.");
       }
-      return Token(Token::Tag::eLoopBegin, "#loop");
+      return Token(
+          Token::Tag::eLoopBegin, "#loop" + std::to_string(id_generator_++));
     } else {
       throw std::runtime_error("Invalid keyword found.");
     }
@@ -79,7 +88,7 @@ Token Lexer::ScanScript() {
   // Handles end of script mode.
   if (current_ == '}' && ReadCompare('}')) {
     script_mode_ = false;
-    return ScanLiterate();
+    return Token(Token::Tag::eScriptEnd, "}}");
   }
   if (current_ == '\0') {
     throw std::runtime_error("EOF found inside script mode.");
@@ -101,9 +110,11 @@ Token Lexer::ScanLiterate() {
         script_mode_ = true;
         current_ = ' '; // This will cause script mode to ignore this value.
         if (!value.empty()) {
+          must_return_script_begin_ = true;
           return Token(Token::Tag::eNoOp, value);
         } else {
-          return ScanScript();
+          must_return_script_begin_ = false;
+          return Token(Token::Tag::eScriptBegin, "{{");
         }
       } else if (current_ == '\\') {
         if (ReadCompare('{')) {

@@ -11,7 +11,9 @@ class Token {
     eNoOp = 1,
     eLoopBegin = 4,
     eLoopEnd = 5,
-    eIdentifier = 6
+    eIdentifier = 6,
+    eScriptBegin = 7,
+    eScriptEnd = 8
   };
 
   explicit Token(Tag tag, std::string value);
