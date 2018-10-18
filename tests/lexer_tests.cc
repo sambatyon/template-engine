@@ -2,8 +2,9 @@
 
 #include <yate/lexer.hh>
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 
 int LexerTests::RunTests() {
@@ -13,12 +14,15 @@ int LexerTests::RunTests() {
   return result;
 }
 
+// Very simple test used to check the behavior of the lexer when given
+// only literate mode characters. It also checks that the string
+// `{\\{` is properly handled (so that there is a way to write `{{`.
 int LexerTests::TestLiterateOnly() {
   std::stringstream stream("This is a {\\{string{\\o");
   yate::Lexer lexer(stream);
   auto token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eNoOp);
-  std::cout << token.value() << '\n';
+  assert(token.value() == "This is a {{string{\\o");
 
   return 0;
 }
@@ -32,47 +36,46 @@ int LexerTests::TestMultiTokenInput() {
 
   auto token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eNoOp);
-  std::cout << token.value() << '\n';
+  assert(token.value() == "Input {{complex{\\this is ");
 
   token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eIdentifier);
-  std::cout << token.value() << '\n';
+  assert(token.value() == "with");
 
   token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eNoOp);
-  std::cout << token.value() << '\n';
+  assert(token.value() == " some ");
 
   token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eLoopBegin);
-  std::cout << token.value() << '\n';
+  assert(token.value() == "#loop");
 
   token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eIdentifier);
-  std::cout << token.value() << '\n';
+  assert(token.value() == "array");
 
   token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eIdentifier);
-  std::cout << token.value() << '\n';
+  assert(token.value() == "item");
 
   token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eNoOp);
-  std::cout << token.value() << '\n';
+  assert(token.value() == " funny ");
 
   token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eIdentifier);
-  std::cout << token.value() << '\n';
+  assert(token.value() == "item");
 
   token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eNoOp);
-  std::cout << token.value() << '\n';
+  assert(token.value() == " in it ");
 
   token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eLoopEnd);
-  std::cout << token.value() << '\n';
+  assert(token.value() == "/loop");
 
   token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eEOF);
-  std::cout  << token.value() << '\n';
 
   return 0;
 }
