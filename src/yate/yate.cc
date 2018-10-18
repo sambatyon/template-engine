@@ -11,7 +11,7 @@ std::string hello(const std::string& world) {
 Environment::Environment() {}
 
 std::ostream &Environment::Render(std::istream &input, std::ostream &output) {
-
+  return output;
 }
 
 } // namespace yate
