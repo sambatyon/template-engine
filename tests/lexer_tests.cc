@@ -1,6 +1,7 @@
 #include "lexer_tests.hh"
 
 #include <yate/lexer.hh>
+#include <yate/utils.hh>
 
 #include <iostream>
 #include <sstream>
@@ -11,6 +12,7 @@ int LexerTests::RunTests() {
   int result = 0;
   result += TestLiterateOnly() == 0 ? 0 : 1;
   result += TestMultiTokenInput() == 0 ? 0 : 1;
+  result += TestInputValidation() == 0 ? 0 : 1;
   return result;
 }
 
@@ -28,6 +30,8 @@ int LexerTests::TestLiterateOnly() {
 }
 
 
+// Tests the functionality of the whole lexer making use of all the
+// recognized tokens.
 int LexerTests::TestMultiTokenInput() {
   std::stringstream stream(
       "Input {\\{complex{\\this is {{with}} some {{#loop array item}} funny "
@@ -77,5 +81,90 @@ int LexerTests::TestMultiTokenInput() {
   token = lexer.Scan();
   assert(token.tag() == yate::Token::Tag::eEOF);
 
+  return 0;
+}
+
+int LexerTests::TestInputValidation() {
+  {
+    // Check that EOF inside script mode is an error.
+    std::stringstream stream("{{");
+    yate::Lexer lexer(stream);
+    bool error_thrown = false;
+    try {
+      lexer.Scan();
+    } catch (const std::runtime_error &e) {
+      error_thrown = true;
+      assert(e.what() == std::string("EOF found inside script mode."));
+    }
+    assert(error_thrown);
+  }
+  {
+    // Check that `#loop` is not accepted with suffixes.
+    std::stringstream stream("{{#looper}}");
+    yate::Lexer lexer(stream);
+    bool error_thrown = false;
+    try {
+      lexer.Scan();
+    } catch (const std::runtime_error &e) {
+      error_thrown = true;
+      assert(e.what() == std::string("Invalid keyword found."));
+    }
+    assert(error_thrown);
+  }
+  {
+    // Check that we fail with unknown keywords
+    std::stringstream stream("{{#while}}");
+    yate::Lexer lexer(stream);
+    bool error_thrown = false;
+    try {
+      lexer.Scan();
+    } catch (const std::runtime_error &e) {
+      error_thrown = true;
+      assert(e.what() == std::string("Invalid keyword found."));
+    }
+    assert(error_thrown);
+  }
+  {
+    // Check that `/loop` is not accepted with suffixes.
+    std::stringstream stream("{{/looper}}");
+    yate::Lexer lexer(stream);
+    bool error_thrown = false;
+    try {
+      lexer.Scan();
+    } catch (const std::runtime_error &e) {
+      error_thrown = true;
+      assert(e.what() == std::string("Invalid keyword found."));
+    }
+    assert(error_thrown);
+  }
+  {
+    // Check that we fail with unknown keywords
+    std::stringstream stream("{{/while}}");
+    yate::Lexer lexer(stream);
+    bool error_thrown = false;
+    try {
+      lexer.Scan();
+    } catch (const std::runtime_error &e) {
+      error_thrown = true;
+      assert(e.what() == std::string("Invalid keyword found."));
+    }
+    assert(error_thrown);
+  }
+
+  {
+    // Check that we fail with invalid strings.
+    std::stringstream stream("{{#loop 12}}");
+    yate::Lexer lexer(stream);
+    bool error_thrown = false;
+    try {
+      lexer.Scan();
+      lexer.Scan();
+    } catch (const std::runtime_error &e) {
+      error_thrown = true;
+      assert(begins_with(std::string(e.what()),
+                         std::string("Cannot recognize character '")));
+    }
+    assert(error_thrown);
+  }
   return 0;
 }

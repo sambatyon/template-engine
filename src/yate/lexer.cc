@@ -47,11 +47,11 @@ Token Lexer::ScanScript() {
         ReadCompare('p')) {
       ReadChar();
       if (std::isalnum(current_)) {
-        throw std::runtime_error("Invalid input");
+        throw std::runtime_error("Invalid keyword found.");
       }
       return Token(Token::Tag::eLoopBegin, "#loop");
     } else {
-      throw std::runtime_error("Invalid input");
+      throw std::runtime_error("Invalid keyword found.");
     }
   }
   // Handles keywords ends, which should start with '/'
@@ -60,11 +60,11 @@ Token Lexer::ScanScript() {
         ReadCompare('p')) {
       ReadChar();
       if (std::isalnum(current_)) {
-        throw std::runtime_error("Invalid input");
+        throw std::runtime_error("Invalid keyword found.");
       }
       return Token(Token::Tag::eLoopEnd, "/loop");
     } else {
-      throw std::runtime_error("Invalid input");
+      throw std::runtime_error("Invalid keyword found.");
     }
   }
   // Handles Identifiers.
@@ -79,12 +79,15 @@ Token Lexer::ScanScript() {
   // Handles end of script mode.
   if (current_ == '}' && ReadCompare('}')) {
     script_mode_ = false;
-    if (current_ == '\0') {
-      return Token(Token::Tag::eEOF, "");
-    }
     return ScanLiterate();
   }
-  throw std::runtime_error("Invalid input");
+  if (current_ == '\0') {
+    throw std::runtime_error("EOF found inside script mode.");
+  }
+  std::string message = "Cannot recognize character '";
+  message += current_;
+  message += "'.";
+  throw std::runtime_error(message);
 }
 
 Token Lexer::ScanLiterate() {
