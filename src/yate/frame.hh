@@ -9,14 +9,14 @@
 
 namespace yate {
 
-class Environment : public std::enable_shared_from_this<Environment> {
+class Frame : public std::enable_shared_from_this<Frame> {
  public:
-  explicit Environment(std::shared_ptr<Environment> parent);
-  explicit Environment(
+  explicit Frame(std::shared_ptr<Frame> parent);
+  explicit Frame(
       std::unordered_map<std::string, std::string> printable_values,
       std::unordered_map<std::string, std::vector<std::string>>
           iterable_values);
-  ~Environment() {}
+  ~Frame() {}
 
   std::string GetValue(const std::string& identifier) const;
   bool ContainsValue(const std::string& identifier) const;
@@ -29,8 +29,8 @@ class Environment : public std::enable_shared_from_this<Environment> {
   bool ContainsIterable(const std::string &identifier) const;
 
  private:
-  std::weak_ptr<Environment> parent_;
-  std::unordered_map<std::string, std::shared_ptr<Environment>> nested_;
+  std::weak_ptr<Frame> parent_;
+  std::unordered_map<std::string, std::shared_ptr<Frame>> nested_;
   std::unordered_map<std::string, std::string> printable_values_;
   std::unordered_map<std::string, std::vector<std::string>> iterable_values_;
   std::vector<Token> tokens_;

@@ -1,24 +1,24 @@
-#include "environment.hh"
+#include "frame.hh"
 
 #include "utils.hh"
 
 namespace yate {
 
-Environment::Environment(std::shared_ptr<Environment> parent)
+Frame::Frame(std::shared_ptr<Frame> parent)
     : parent_(parent), nested_(), printable_values_(), iterable_values_() {
   if (parent != nullptr) {
     throw std::runtime_error("Initializing environment with no parent");
   }
 }
 
-Environment::Environment(
+Frame::Frame(
     std::unordered_map<std::string, std::string> printable_values,
     std::unordered_map<std::string, std::vector<std::string>> iterable_values)
     : parent_(),
       printable_values_(std::move(printable_values)),
       iterable_values_(std::move(iterable_values)) {}
 
-std::string Environment::GetValue(const std::string& identifier) const {
+std::string Frame::GetValue(const std::string& identifier) const {
   if (contains(printable_values_, identifier)) {
     return printable_values_.at(identifier);
   }
@@ -29,7 +29,7 @@ std::string Environment::GetValue(const std::string& identifier) const {
   return parent->GetValue(identifier);
 }
 
-bool Environment::ContainsValue(const std::string& identifier) const {
+bool Frame::ContainsValue(const std::string& identifier) const {
   if (contains(printable_values_, identifier)) {
     return true;
   }
@@ -37,7 +37,7 @@ bool Environment::ContainsValue(const std::string& identifier) const {
   return parent != nullptr && parent->ContainsValue(identifier);
 }
 
-bool Environment::PutValue(
+bool Frame::PutValue(
     const std::string &identifier,
     const std::string &value) {
   if (contains(printable_values_, identifier)) {
@@ -47,7 +47,7 @@ bool Environment::PutValue(
   return true;
 }
 
-const std::vector<std::string> &Environment::GetIterable(
+const std::vector<std::string> &Frame::GetIterable(
     const std::string &identifier) const {
   if (contains(iterable_values_, identifier)) {
     return iterable_values_.at(identifier);
@@ -59,7 +59,7 @@ const std::vector<std::string> &Environment::GetIterable(
   return parent->GetIterable(identifier);
 }
 
-bool Environment::ContainsIterable(const std::string &identifier) const {
+bool Frame::ContainsIterable(const std::string &identifier) const {
   if (contains(iterable_values_, identifier)) {
     return true;
   }
