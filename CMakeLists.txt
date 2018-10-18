@@ -14,16 +14,19 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LIB_OUTPUT_DIR})
 include(CheckCXXCompilerFlag)
 
 # Allows cmake to choose the best standard for compilation.
-set(REQUIRED_CXX_FEATURES
-  cxx_auto_type
-  cxx_constexpr
-  cxx_deleted_functions
-  cxx_lambdas
-  cxx_nullptr
-  cxx_override
-  cxx_range_for
-  cxx_variadic_templates
-)
+# set(REQUIRED_CXX_FEATURES
+#   cxx_auto_type
+#   cxx_constexpr
+#   cxx_deleted_functions
+#   cxx_lambdas
+#   cxx_nullptr
+#   cxx_override
+#   cxx_range_for
+#   cxx_variadic_templates
+#)
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ADD_DEFINITIONS(-DPACKAGE_NAME=${PROJECT_PREFIX})
 
