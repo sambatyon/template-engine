@@ -15,19 +15,33 @@ Renderer::Renderer(
 }
 
 void Renderer::Render(std::istream &input, std::ostream &output) {
+  lexer_ = std::make_unique<Lexer>(input);
 }
 
 void Renderer::ParseFrame(Token frame_type) {
-  // Create a new frame with id frame_type.value()
-  // Set this frame in the children frames of the parent
-  // replace top.
-  auto new_frame = std::make_shared<Frame>(top_);
-
   auto current = frame_type;
-  // TODO: validate this.
   auto array_id = lexer_->Scan(); // must be eIdentifier and exist
-  auto item_id = lexer_->Scan(); // must be eIdentifier and exist
-  current = lexer_->Scan(); // must be }}
+  if (array_id.tag() != Token::Tag::eIdentifier) {
+    throw std::runtime_error("Invalid Syntax");
+  }
+  if (!top_->ContainsIterable(array_id.value())) {
+    throw std::runtime_error("Use of invalid array name " + array_id.value());
+  }
+  auto item_id = lexer_->Scan(); // must be eIdentifier
+  if (array_id.tag() != Token::Tag::eIdentifier) {
+    throw std::runtime_error("Invalid Syntax");
+  }
+  current = lexer_->Scan(); // must be `}}`
+  if (array_id.tag() != Token::Tag::eScriptEnd) {
+    throw std::runtime_error("Invalid Syntax");
+  }
+
+  auto new_frame = std::make_shared<Frame>(
+      top_, frame_type.value(), array_id.value(), item_id.value());
+
+  top_->AddNestedFrame(new_frame);
+  top_ = new_frame;
+
   while (current.tag() != Token::Tag::eEOF) {
     current = lexer_->Scan();
     if (current.tag() == Token::Tag::eScriptBegin) {
@@ -45,7 +59,11 @@ void Renderer::ParseFrame(Token frame_type) {
         if (current.tag() != Token::Tag::eScriptEnd) {
           throw std::runtime_error("Invalid Syntax");
         }
-        // Replace top frame with parent frame.
+        auto parent = top_->parent().lock();
+        if (parent == nullptr) {
+          throw std::runtime_error("Invalid Syntax, leaving parent frame");
+        }
+        top_ = parent;
         return;
       }
     }
