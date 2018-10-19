@@ -42,7 +42,7 @@ std::streampos Renderer::Render(std::ostream &output) {
             }
           } break;
           case Token::Tag::eLoopBegin: {
-            auto loop_variables = SetLoopFrame();
+            auto loop_variables = SetLoopFrame(current.value());
             auto loop_begin = lexer_->CurrentStreamPos();
             std::streampos loop_end;
             for (const auto &item :
@@ -78,7 +78,7 @@ std::streampos Renderer::Render(std::ostream &output) {
   return lexer_->CurrentStreamPos();
 }
 
-std::tuple<Token, Token> Renderer::SetLoopFrame() {
+std::tuple<Token, Token> Renderer::SetLoopFrame(const std::string &frame_id) {
   auto array_id = lexer_->Scan(); // must be eIdentifier and exist
   if (array_id.tag() != Token::Tag::eIdentifier) {
     throw std::runtime_error(CreateError(array_id, Token::Tag::eIdentifier));
@@ -95,7 +95,7 @@ std::tuple<Token, Token> Renderer::SetLoopFrame() {
     throw std::runtime_error(CreateError(current, Token::Tag::eScriptEnd));
   }
 
-  auto new_frame = std::make_shared<Frame>(top_);
+  auto new_frame = std::make_shared<Frame>(top_, frame_id);
   top_ = new_frame;
 
   return {array_id, item_id};

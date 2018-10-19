@@ -12,7 +12,7 @@ namespace yate {
 class Frame : public std::enable_shared_from_this<Frame> {
  public:
   explicit Frame(
-      std::shared_ptr<Frame> parent);
+      std::shared_ptr<Frame> parent, std::string id);
   explicit Frame(
       std::unordered_map<std::string, std::string> printable_values,
       std::unordered_map<std::string, std::vector<std::string>>
@@ -20,6 +20,7 @@ class Frame : public std::enable_shared_from_this<Frame> {
   ~Frame() {}
 
   std::weak_ptr<Frame> parent() const { return parent_; }
+  std::string id() const { return id_; }
 
   std::string GetValue(const std::string& identifier) const;
   bool ContainsValue(const std::string& identifier) const;
@@ -30,9 +31,10 @@ class Frame : public std::enable_shared_from_this<Frame> {
   bool ContainsIterable(const std::string &identifier) const;
 
  private:
-  std::weak_ptr<Frame> parent_;
+  std::shared_ptr<Frame> parent_;
   std::unordered_map<std::string, std::string> printable_values_;
   std::unordered_map<std::string, std::vector<std::string>> iterable_values_;
+  std::string id_;
 };
 
 } // namespace yate

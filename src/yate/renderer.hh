@@ -28,7 +28,7 @@ class Renderer {
   std::unique_ptr<Lexer> lexer_;
 
   std::streampos Render(std::ostream &output);
-  std::tuple<Token, Token> SetLoopFrame();
+  std::tuple<Token, Token> SetLoopFrame(const std::string &frame_id);
   void RestoreParentFrame();
 
   std::string CreateError(const Token &token, Token::Tag expected);
