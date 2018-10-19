@@ -4,6 +4,7 @@
 #include <yate/utils.hh>
 
 #include <iostream>
+#include <regex>
 #include <sstream>
 #include <string>
 
@@ -139,7 +140,10 @@ int LexerTests::TestInputValidation() {
       lexer.Scan();
     } catch (const std::runtime_error &e) {
       error_thrown = true;
-      assert(e.what() == std::string("EOF found inside script mode."));
+      assert(
+          e.what() ==
+          std::string(
+              "Error found in line 1 column 3: EOF found inside script mode."));
     }
     assert(error_thrown);
   }
@@ -153,7 +157,10 @@ int LexerTests::TestInputValidation() {
       lexer.Scan();
     } catch (const std::runtime_error &e) {
       error_thrown = true;
-      assert(e.what() == std::string("Invalid keyword found."));
+      assert(
+          e.what() ==
+          std::string(
+              "Error found in line 1 column 8: Invalid keyword found"));
     }
     assert(error_thrown);
   }
@@ -167,7 +174,10 @@ int LexerTests::TestInputValidation() {
       lexer.Scan();
     } catch (const std::runtime_error &e) {
       error_thrown = true;
-      assert(e.what() == std::string("Invalid keyword found."));
+      assert(
+          e.what() ==
+          std::string(
+              "Error found in line 1 column 4: Invalid keyword found."));
     }
     assert(error_thrown);
   }
@@ -181,7 +191,10 @@ int LexerTests::TestInputValidation() {
       lexer.Scan();
     } catch (const std::runtime_error &e) {
       error_thrown = true;
-      assert(e.what() == std::string("Invalid keyword found."));
+      assert(
+          e.what() ==
+          std::string(
+              "Error found in line 1 column 8: Invalid keyword found."));
     }
     assert(error_thrown);
   }
@@ -195,7 +208,10 @@ int LexerTests::TestInputValidation() {
       lexer.Scan();
     } catch (const std::runtime_error &e) {
       error_thrown = true;
-      assert(e.what() == std::string("Invalid keyword found."));
+      assert(
+          e.what() ==
+          std::string(
+              "Error found in line 1 column 4: Invalid keyword found."));
     }
     assert(error_thrown);
   }
@@ -211,8 +227,10 @@ int LexerTests::TestInputValidation() {
       lexer.Scan();
     } catch (const std::runtime_error &e) {
       error_thrown = true;
-      assert(begins_with(std::string(e.what()),
-                         std::string("Cannot recognize character '")));
+      assert(begins_with(
+          std::string(e.what()),
+          std::string(
+              "Error found in line 1 column 9: Cannot recognize character '")));
     }
     assert(error_thrown);
   }

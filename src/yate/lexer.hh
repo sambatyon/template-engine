@@ -19,6 +19,8 @@ class Lexer {
   std::istream::char_type ReadChar();
   std::istream::char_type ReadCompare(std::istream::char_type ch);
 
+  std::string GenerateError(const std::string &message);
+
   Token ScanLiterate();
   Token ScanScript();
 
@@ -28,6 +30,8 @@ class Lexer {
   bool initialized_; // TODO: Find a more elegant solution to this.
   std::uint64_t id_generator_;
   bool must_return_script_begin_;
+  std::uint32_t line_;
+  std::uint32_t column_;
 };
 
 } // yate

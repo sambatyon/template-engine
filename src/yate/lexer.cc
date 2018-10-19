@@ -10,15 +10,30 @@ Lexer::Lexer(std::istream &istream)
       script_mode_(false),
       initialized_(false),
       id_generator_(0),
-      must_return_script_begin_(false) {}
+      must_return_script_begin_(false),
+      line_(1),
+      column_(0) {}
 
 std::istream::char_type Lexer::ReadChar() {
   istream_.get(current_);
   if (istream_.eof() || istream_.fail() || istream_.bad()) {
     current_ = '\0';
   }
+  ++column_;
+  if (current_ == '\n') {
+    ++line_;
+    column_ = 0;
+  }
   return current_;
 }
+
+
+std::string Lexer::GenerateError(const std::string &message)
+{
+  return "Error found in line " + std::to_string(line_) + " column " +
+      std::to_string(column_) + ": " + message;
+}
+
 
 std::istream::char_type Lexer::ReadCompare(std::istream::char_type ch) {
   ReadChar();
@@ -30,7 +45,7 @@ std::istream::char_type Lexer::ReadCompare(std::istream::char_type ch) {
 
 Token Lexer::Scan() {
   if (initialized_ && current_ == '\0') {
-    return Token(Token::Tag::eEOF, "");
+    return Token(Token::Tag::eEOF, "", line_, column_);
   }
   initialized_ = true;
   if (script_mode_) {
@@ -43,24 +58,29 @@ Token Lexer::Scan() {
 Token Lexer::ScanScript() {
   if (must_return_script_begin_) {
     must_return_script_begin_ = false;
-    return Token(Token::Tag::eScriptBegin, "{{");
+    return Token(Token::Tag::eScriptBegin, "{{", line_, column_-2);
   }
   // In script mode we discard all spaces
-  while (current_ == ' ' || current_ == '\t') {
+  while (std::isspace(current_)) {
     ReadChar();
   }
+  auto line = line_;
+  auto column = column_;
   // Handles keywords begin which should start with '#'
   if (current_ == '#') {
     if (ReadCompare('l') && ReadCompare('o') && ReadCompare('o') &&
         ReadCompare('p')) {
       ReadChar();
       if (std::isalnum(current_)) {
-        throw std::runtime_error("Invalid keyword found.");
+        throw std::runtime_error(GenerateError("Invalid keyword found"));
       }
       return Token(
-          Token::Tag::eLoopBegin, "#loop" + std::to_string(id_generator_++));
+          Token::Tag::eLoopBegin,
+          "#loop" + std::to_string(id_generator_++),
+          line,
+          column);
     } else {
-      throw std::runtime_error("Invalid keyword found.");
+      throw std::runtime_error(GenerateError("Invalid keyword found."));
     }
   }
   // Handles keywords ends, which should start with '/'
@@ -69,11 +89,11 @@ Token Lexer::ScanScript() {
         ReadCompare('p')) {
       ReadChar();
       if (std::isalnum(current_)) {
-        throw std::runtime_error("Invalid keyword found.");
+        throw std::runtime_error(GenerateError("Invalid keyword found."));
       }
-      return Token(Token::Tag::eLoopEnd, "/loop");
+      return Token(Token::Tag::eLoopEnd, "/loop", line, column);
     } else {
-      throw std::runtime_error("Invalid keyword found.");
+      throw std::runtime_error(GenerateError("Invalid keyword found."));
     }
   }
   // Handles Identifiers.
@@ -83,24 +103,26 @@ Token Lexer::ScanScript() {
       value += current_;
       ReadChar();
     } while (std::isalnum(current_));
-    return Token(Token::Tag::eIdentifier, value);
+    return Token(Token::Tag::eIdentifier, value, line, column);
   }
   // Handles end of script mode.
   if (current_ == '}' && ReadCompare('}')) {
     script_mode_ = false;
-    return Token(Token::Tag::eScriptEnd, "}}");
+    return Token(Token::Tag::eScriptEnd, "}}", line, column);
   }
   if (current_ == '\0') {
-    throw std::runtime_error("EOF found inside script mode.");
+    throw std::runtime_error(GenerateError("EOF found inside script mode."));
   }
   std::string message = "Cannot recognize character '";
   message += current_;
   message += "'.";
-  throw std::runtime_error(message);
+  throw std::runtime_error(GenerateError(message));
 }
 
 Token Lexer::ScanLiterate() {
   ReadChar();
+  auto line = line_;
+  auto column = column_;
   std::string value;
   // Consume all input until we come to a `{{` which indicates the
   // begin of script mode.
@@ -111,10 +133,10 @@ Token Lexer::ScanLiterate() {
         current_ = ' '; // This will cause script mode to ignore this value.
         if (!value.empty()) {
           must_return_script_begin_ = true;
-          return Token(Token::Tag::eNoOp, value);
+          return Token(Token::Tag::eNoOp, value, line, column);
         } else {
           must_return_script_begin_ = false;
-          return Token(Token::Tag::eScriptBegin, "{{");
+          return Token(Token::Tag::eScriptBegin, "{{", line, column);
         }
       } else if (current_ == '\\') {
         if (ReadCompare('{')) {
@@ -131,9 +153,9 @@ Token Lexer::ScanLiterate() {
   }
   // Investigate the case of the string containing only '\0'
   if (!value.empty()) {
-    return Token(Token::Tag::eNoOp, value);
+    return Token(Token::Tag::eNoOp, value, line, column);
   } else {
-    return Token(Token::Tag::eEOF, "EOF");
+    return Token(Token::Tag::eEOF, "EOF", line, column);
   }
 }
 

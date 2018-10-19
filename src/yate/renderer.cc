@@ -62,18 +62,18 @@ void Renderer::ParseFrame(Token frame_type) {
   auto current = frame_type;
   auto array_id = lexer_->Scan(); // must be eIdentifier and exist
   if (array_id.tag() != Token::Tag::eIdentifier) {
-    throw std::runtime_error("Invalid Syntax");
+    throw std::runtime_error(CreateError(array_id, Token::Tag::eIdentifier));
   }
   if (!top_->ContainsIterable(array_id.value())) {
-    throw std::runtime_error("Use of invalid array name " + array_id.value());
+    throw std::runtime_error("Array " + array_id.value() + " is not defined");
   }
   auto item_id = lexer_->Scan(); // must be eIdentifier
-  if (array_id.tag() != Token::Tag::eIdentifier) {
-    throw std::runtime_error("Invalid Syntax");
+  if (item_id.tag() != Token::Tag::eIdentifier) {
+    throw std::runtime_error(CreateError(item_id, Token::Tag::eIdentifier));
   }
   current = lexer_->Scan(); // must be `}}`
-  if (array_id.tag() != Token::Tag::eScriptEnd) {
-    throw std::runtime_error("Invalid Syntax");
+  if (current.tag() != Token::Tag::eScriptEnd) {
+    throw std::runtime_error(CreateError(current, Token::Tag::eScriptEnd));
   }
 
   auto new_frame = std::make_shared<Frame>(
@@ -92,12 +92,14 @@ void Renderer::ParseFrame(Token frame_type) {
         top_->tokens().push_back(current);
         current = lexer_->Scan();
         if (current.tag() != Token::Tag::eScriptEnd) {
-          throw std::runtime_error("Invalid Syntax");
+          throw std::runtime_error(
+              CreateError(current, Token::Tag::eScriptEnd));
         }
       } else if (current.tag() == Token::Tag::eLoopEnd) {
         current = lexer_->Scan();
         if (current.tag() != Token::Tag::eScriptEnd) {
-          throw std::runtime_error("Invalid Syntax");
+          throw std::runtime_error(
+              CreateError(current, Token::Tag::eScriptEnd));
         }
         auto parent = top_->parent().lock();
         if (parent == nullptr) {
@@ -109,6 +111,14 @@ void Renderer::ParseFrame(Token frame_type) {
     }
     top_->tokens().push_back(current);
   }
+}
+
+std::string Renderer::CreateError(const Token &token, Token::Tag expected) {
+  return "Invalid Syntax: Expected " + to_string(expected) + "'' but got '" +
+         to_string(token.tag()) +
+         (token.value().empty() ? "" : ("(" + token.value() + ")")) +
+         " at line " + std::to_string(token.line()) + " column " +
+         std::to_string(token.column());
 }
 
 } // namespace yate

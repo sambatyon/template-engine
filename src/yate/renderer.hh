@@ -1,6 +1,7 @@
 #pragma once
 
 #include "lexer.hh"
+#include "token.hh"
 
 #include <memory>
 #include <string>
@@ -10,7 +11,6 @@
 namespace yate {
 
 class Frame;
-class Token;
 
 class Renderer {
  public:
@@ -27,6 +27,8 @@ class Renderer {
   std::shared_ptr<Frame> top_;
   std::shared_ptr<Frame> root_;
   std::unique_ptr<Lexer> lexer_;
+
+  std::string CreateError(const Token &token, Token::Tag expected);
 };
 
 } // namespace yate
