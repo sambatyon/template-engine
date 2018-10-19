@@ -5,4 +5,5 @@ struct RenderTests {
 
   int TestFlatTemplate();
   int TestSimpleTemplate();
+  int TestTemplateWithLoop();
 };

@@ -21,12 +21,15 @@ class Renderer {
   ~Renderer() {}
 
   void Render(std::istream &input, std::ostream &output);
-  void ParseFrame(Token /*frame_type*/);
 
  private:
   std::shared_ptr<Frame> top_;
   std::shared_ptr<Frame> root_;
   std::unique_ptr<Lexer> lexer_;
+
+  std::streampos Render(std::ostream &output);
+  std::tuple<Token, Token> SetLoopFrame();
+  void RestoreParentFrame();
 
   std::string CreateError(const Token &token, Token::Tag expected);
 };

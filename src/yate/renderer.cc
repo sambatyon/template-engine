@@ -16,6 +16,10 @@ Renderer::Renderer(
 
 void Renderer::Render(std::istream &input, std::ostream &output) {
   lexer_ = std::make_unique<Lexer>(input);
+  Render(output);
+}
+
+std::streampos Renderer::Render(std::ostream &output) {
   auto current = lexer_->Scan();
   while (current.tag() != Token::Tag::eEOF) {
     switch (current.tag()) {
@@ -28,19 +32,35 @@ void Renderer::Render(std::istream &input, std::ostream &output) {
           case Token::Tag::eIdentifier: {
             std::string id = current.value();
             if (!top_->ContainsValue(id)) {
-              throw std::runtime_error("Use of undeclared id '" + id + "'");
+              throw std::runtime_error("Identifier '" + id + "' is undefined");
             }
             output << top_->GetValue(id);
             current = lexer_->Scan();
             if (current.tag() != Token::Tag::eScriptEnd) {
               throw std::runtime_error(
-                  "Syntax Error: Unexpected token " + current.value());
+                  CreateError(current, Token::Tag::eScriptEnd));
             }
           } break;
           case Token::Tag::eLoopBegin: {
-            std::string frame_id = current.value();
-            ParseFrame(current);
-            // print(frame_id);
+            auto loop_variables = SetLoopFrame();
+            auto loop_begin = lexer_->CurrentStreamPos();
+            std::streampos loop_end;
+            for (const auto &item :
+                 top_->GetIterable(std::get<0>(loop_variables).value())) {
+              top_->PutValue(std::get<1>(loop_variables).value(), item);
+              loop_end = Render(output);
+              lexer_->SetStreamPos(loop_begin);
+            }
+            RestoreParentFrame();
+            lexer_->SetStreamPos(loop_end);
+          } break;
+          case Token::Tag::eLoopEnd: {
+            current = lexer_->Scan();
+            if (current.tag() != Token::Tag::eScriptEnd) {
+              throw std::runtime_error(
+                  CreateError(current, Token::Tag::eScriptEnd));
+            }
+            return lexer_->CurrentStreamPos();
           } break;
           default:
             throw std::runtime_error(
@@ -55,11 +75,10 @@ void Renderer::Render(std::istream &input, std::ostream &output) {
     }
     current = lexer_->Scan();
   }
-  // TODO: clear child frames.
+  return lexer_->CurrentStreamPos();
 }
 
-void Renderer::ParseFrame(Token frame_type) {
-  auto current = frame_type;
+std::tuple<Token, Token> Renderer::SetLoopFrame() {
   auto array_id = lexer_->Scan(); // must be eIdentifier and exist
   if (array_id.tag() != Token::Tag::eIdentifier) {
     throw std::runtime_error(CreateError(array_id, Token::Tag::eIdentifier));
@@ -71,46 +90,23 @@ void Renderer::ParseFrame(Token frame_type) {
   if (item_id.tag() != Token::Tag::eIdentifier) {
     throw std::runtime_error(CreateError(item_id, Token::Tag::eIdentifier));
   }
-  current = lexer_->Scan(); // must be `}}`
+  auto current = lexer_->Scan(); // must be `}}`
   if (current.tag() != Token::Tag::eScriptEnd) {
     throw std::runtime_error(CreateError(current, Token::Tag::eScriptEnd));
   }
 
-  auto new_frame = std::make_shared<Frame>(
-      top_, frame_type.value(), array_id.value(), item_id.value());
-
-  top_->AddNestedFrame(new_frame);
+  auto new_frame = std::make_shared<Frame>(top_);
   top_ = new_frame;
 
-  while (current.tag() != Token::Tag::eEOF) {
-    current = lexer_->Scan();
-    if (current.tag() == Token::Tag::eScriptBegin) {
-      current = lexer_->Scan();
-      if (current.tag() == Token::Tag::eLoopBegin) {
-        ParseFrame(current);
-      } else if (current.tag() == Token::Tag::eIdentifier) {
-        top_->tokens().push_back(current);
-        current = lexer_->Scan();
-        if (current.tag() != Token::Tag::eScriptEnd) {
-          throw std::runtime_error(
-              CreateError(current, Token::Tag::eScriptEnd));
-        }
-      } else if (current.tag() == Token::Tag::eLoopEnd) {
-        current = lexer_->Scan();
-        if (current.tag() != Token::Tag::eScriptEnd) {
-          throw std::runtime_error(
-              CreateError(current, Token::Tag::eScriptEnd));
-        }
-        auto parent = top_->parent().lock();
-        if (parent == nullptr) {
-          throw std::runtime_error("Invalid Syntax, leaving parent frame");
-        }
-        top_ = parent;
-        return;
-      }
-    }
-    top_->tokens().push_back(current);
+  return {array_id, item_id};
+}
+
+void Renderer::RestoreParentFrame() {
+  auto parent = top_->parent().lock();
+  if (parent == nullptr) {
+    throw std::runtime_error("Invalid Syntax, leaving parent frame");
   }
+  top_ = parent;
 }
 
 std::string Renderer::CreateError(const Token &token, Token::Tag expected) {
