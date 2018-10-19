@@ -15,6 +15,9 @@ class Lexer {
 
   Token Scan();
 
+  std::streampos CurrentStreamPos() const;
+  void SetStreamPos(std::streampos pos);
+
  private:
   std::istream::char_type ReadChar();
   std::istream::char_type ReadCompare(std::istream::char_type ch);

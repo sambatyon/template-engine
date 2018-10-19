@@ -27,6 +27,14 @@ std::istream::char_type Lexer::ReadChar() {
   return current_;
 }
 
+std::streampos Lexer::CurrentStreamPos() const {
+  return istream_.tellg();
+}
+
+void Lexer::SetStreamPos(std::streampos pos) {
+  istream_.seekg(pos, std::ios_base::beg);
+}
+
 
 std::string Lexer::GenerateError(const std::string &message)
 {
