@@ -17,7 +17,7 @@ Frame::Frame(
       id_(std::move(frame_id)),
       array_id_(std::move(array_id)),
       item_id_(std::move(item_id)) {
-  if (parent != nullptr) {
+  if (parent == nullptr) {
     throw std::runtime_error("Initializing environment with no parent");
   }
 }
