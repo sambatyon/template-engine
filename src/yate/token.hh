@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ostream>
 #include <string>
 
 namespace yate {
@@ -40,5 +41,6 @@ class Token {
 };
 
 std::string to_string(Token::Tag tag);
+std::ostream &operator<<(std::ostream &stream, Token::Tag tag);
 
 } // namespace yate

@@ -1,4 +1,5 @@
 #include "lexer_tests.hh"
+#include "unit.hh"
 
 #include <yate/lexer.hh>
 #include <yate/utils.hh>
@@ -24,9 +25,8 @@ int LexerTests::TestLiterateOnly() {
   std::stringstream stream("This is a {\\{string{\\o");
   yate::Lexer lexer(stream);
   auto token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eNoOp);
-  assert(token.value() == "This is a {{string{\\o");
-
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eNoOp);
+  TEST_EXPECT_EQ(token.value(), "This is a {{string{\\o");
   return 0;
 }
 
@@ -40,91 +40,91 @@ int LexerTests::TestMultiTokenInput() {
   yate::Lexer lexer(stream);
 
   auto token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eNoOp);
-  assert(token.value() == "Input {{complex{\\this is ");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eNoOp);
+  TEST_EXPECT_EQ(token.value(), "Input {{complex{\\this is ");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eScriptBegin);
-  assert(token.value() == "{{");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eScriptBegin);
+  TEST_EXPECT_EQ(token.value(), "{{");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eIdentifier);
-  assert(token.value() == "with");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eIdentifier);
+  TEST_EXPECT_EQ(token.value(), "with");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eScriptEnd);
-  assert(token.value() == "}}");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eScriptEnd);
+  TEST_EXPECT_EQ(token.value(), "}}");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eNoOp);
-  assert(token.value() == " some ");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eNoOp);
+  TEST_EXPECT_EQ(token.value(), " some ");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eScriptBegin);
-  assert(token.value() == "{{");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eScriptBegin);
+  TEST_EXPECT_EQ(token.value(), "{{");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eLoopBegin);
-  assert(token.value() == "#loop0");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eLoopBegin);
+  TEST_EXPECT_EQ(token.value(), "#loop0");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eIdentifier);
-  assert(token.value() == "array");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eIdentifier);
+  TEST_EXPECT_EQ(token.value(), "array");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eIdentifier);
-  assert(token.value() == "item");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eIdentifier);
+  TEST_EXPECT_EQ(token.value(), "item");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eScriptEnd);
-  assert(token.value() == "}}");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eScriptEnd);
+  TEST_EXPECT_EQ(token.value(), "}}");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eNoOp);
-  assert(token.value() == " funny ");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eNoOp);
+  TEST_EXPECT_EQ(token.value(), " funny ");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eScriptBegin);
-  assert(token.value() == "{{");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eScriptBegin);
+  TEST_EXPECT_EQ(token.value(), "{{");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eIdentifier);
-  assert(token.value() == "item");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eIdentifier);
+  TEST_EXPECT_EQ(token.value(), "item");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eScriptEnd);
-  assert(token.value() == "}}");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eScriptEnd);
+  TEST_EXPECT_EQ(token.value(), "}}");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eNoOp);
-  assert(token.value() == " in it ");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eNoOp);
+  TEST_EXPECT_EQ(token.value(), " in it ");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eScriptBegin);
-  assert(token.value() == "{{");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eScriptBegin);
+  TEST_EXPECT_EQ(token.value(), "{{");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eLoopEnd);
-  assert(token.value() == "/loop");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eLoopEnd);
+  TEST_EXPECT_EQ(token.value(), "/loop");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eScriptEnd);
-  assert(token.value() == "}}");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eScriptEnd);
+  TEST_EXPECT_EQ(token.value(), "}}");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eScriptBegin);
-  assert(token.value() == "{{");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eScriptBegin);
+  TEST_EXPECT_EQ(token.value(), "{{");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eIdentifier);
-  assert(token.value() == "with");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eIdentifier);
+  TEST_EXPECT_EQ(token.value(), "with");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eScriptEnd);
-  assert(token.value() == "}}");
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eScriptEnd);
+  TEST_EXPECT_EQ(token.value(), "}}");
 
   token = lexer.Scan();
-  assert(token.tag() == yate::Token::Tag::eEOF);
+  TEST_EXPECT_EQ(token.tag(), yate::Token::Tag::eEOF);
 
   return 0;
 }
@@ -134,105 +134,60 @@ int LexerTests::TestInputValidation() {
     // Check that EOF inside script mode is an error.
     std::stringstream stream("{{");
     yate::Lexer lexer(stream);
-    bool error_thrown = false;
-    try {
-      lexer.Scan();
-      lexer.Scan();
-    } catch (const std::runtime_error &e) {
-      error_thrown = true;
-      assert(
-          e.what() ==
-          std::string(
-              "Error found in line 1 column 3: EOF found inside script mode."));
-    }
-    assert(error_thrown);
+    lexer.Scan();
+    TEST_EXPECT_EXCEPTION_MSG(
+        lexer.Scan(),
+        std::runtime_error,
+        "Error found in line 1 column 3: EOF found inside script mode.");
   }
   {
     // Check that `#loop` is not accepted with suffixes.
     std::stringstream stream("{{#looper}}");
     yate::Lexer lexer(stream);
-    bool error_thrown = false;
-    try {
-      lexer.Scan();
-      lexer.Scan();
-    } catch (const std::runtime_error &e) {
-      error_thrown = true;
-      assert(
-          e.what() ==
-          std::string(
-              "Error found in line 1 column 8: Invalid keyword found"));
-    }
-    assert(error_thrown);
+    lexer.Scan();
+    TEST_EXPECT_EXCEPTION_MSG(
+        lexer.Scan(),
+        std::runtime_error,
+        "Error found in line 1 column 8: Invalid keyword found");
   }
   {
     // Check that we fail with unknown keywords
     std::stringstream stream("{{#while}}");
     yate::Lexer lexer(stream);
-    bool error_thrown = false;
-    try {
-      lexer.Scan();
-      lexer.Scan();
-    } catch (const std::runtime_error &e) {
-      error_thrown = true;
-      assert(
-          e.what() ==
-          std::string(
-              "Error found in line 1 column 4: Invalid keyword found."));
-    }
-    assert(error_thrown);
+    lexer.Scan();
+    TEST_EXPECT_EXCEPTION_MSG(
+        lexer.Scan(),
+        std::runtime_error,
+        "Error found in line 1 column 4: Invalid keyword found.");
   }
   {
     // Check that `/loop` is not accepted with suffixes.
     std::stringstream stream("{{/looper}}");
     yate::Lexer lexer(stream);
-    bool error_thrown = false;
-    try {
-      lexer.Scan();
-      lexer.Scan();
-    } catch (const std::runtime_error &e) {
-      error_thrown = true;
-      assert(
-          e.what() ==
-          std::string(
-              "Error found in line 1 column 8: Invalid keyword found."));
-    }
-    assert(error_thrown);
+    lexer.Scan();
+    TEST_EXPECT_EXCEPTION_MSG(
+        lexer.Scan(),
+        std::runtime_error,
+        "Error found in line 1 column 8: Invalid keyword found.");
   }
   {
     // Check that we fail with unknown keywords
     std::stringstream stream("{{/while}}");
     yate::Lexer lexer(stream);
-    bool error_thrown = false;
-    try {
-      lexer.Scan();
-      lexer.Scan();
-    } catch (const std::runtime_error &e) {
-      error_thrown = true;
-      assert(
-          e.what() ==
-          std::string(
-              "Error found in line 1 column 4: Invalid keyword found."));
-    }
-    assert(error_thrown);
+    lexer.Scan();
+    TEST_EXPECT_EXCEPTION_MSG(
+        lexer.Scan(),
+        std::runtime_error,
+        "Error found in line 1 column 4: Invalid keyword found.");
   }
 
   {
     // Check that we fail with invalid strings.
     std::stringstream stream("{{#loop 12}}");
     yate::Lexer lexer(stream);
-    bool error_thrown = false;
-    try {
-      lexer.Scan();
-      lexer.Scan();
-      lexer.Scan();
-    } catch (const std::runtime_error &e) {
-      error_thrown = true;
-      assert(begins_with(
-          std::string(e.what()),
-          std::string(
-              "Error found in line 1 column 9: Cannot recognize character '")));
-    }
-    assert(error_thrown);
+    lexer.Scan();
+    lexer.Scan();
+    TEST_EXPECT_EXCEPTION_TYPE(lexer.Scan(), std::runtime_error);
   }
   return 0;
 }

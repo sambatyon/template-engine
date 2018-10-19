@@ -1,5 +1,7 @@
 #include "render_tests.hh"
 
+#include "unit.hh"
+
 #include <yate/renderer.hh>
 
 #include <sstream>
@@ -18,7 +20,7 @@ int RenderTests::TestFlatTemplate() {
   std::stringstream input("Hello World");
   std::stringstream output;
   renderer.Render(input, output);
-  assert(output.str() == std::string("Hello World"));
+  TEST_EXPECT_EQ(output.str(), "Hello World");
   return 0;
 }
 
@@ -28,14 +30,15 @@ int RenderTests::TestSimpleTemplate() {
       "Hello {{foo}}, How are you doing in this {{weather}} day?");
   std::stringstream output;
   renderer.Render(input, output);
-  assert(output.str() == "Hello bar, How are you doing in this sunny day?");
+  TEST_EXPECT_EQ(
+      output.str(), "Hello bar, How are you doing in this sunny day?");
 
   input.str("{{foo}}{{weather}}");
   input.clear();
   output.str("");
   output.clear();
   renderer.Render(input, output);
-  assert(output.str() == "barsunny");
+  TEST_EXPECT_EQ(output.str(), "barsunny");
   return 0;
 }
 
@@ -58,8 +61,8 @@ int RenderTests::TestTemplateWithLoop() {
       "{{hobby}}{{/loop}}");
   std::stringstream output;
   renderer.Render(input, output);
-  assert(
-      output.str() ==
+  TEST_EXPECT_EQ(
+      output.str(),
       "Hi, I'm bar and my hobies are \n- baking\n- music\n- hiking");
   return 0;
 }

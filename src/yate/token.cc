@@ -51,4 +51,8 @@ std::string to_string(Token::Tag tag) {
   }
 }
 
+std::ostream &operator<<(std::ostream &stream, Token::Tag tag) {
+  return stream << to_string(tag);
+}
+
 } // namespace yate
