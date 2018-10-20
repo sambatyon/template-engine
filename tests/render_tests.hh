@@ -8,4 +8,5 @@ struct RenderTests {
   int TestTemplateWithLoop();
   int TestTemplateNestedLoop();
   int TestTemplateVarialbleShadowing();
+  int TestRenderErrors();
 };

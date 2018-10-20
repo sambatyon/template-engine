@@ -6,10 +6,12 @@
 #include <yate/yate.hh>
 
 int main(int argc, char **argv) {
+  int return_code = 0;
   LexerTests lexer_tests;
-  lexer_tests.RunTests();
+  return_code += lexer_tests.RunTests();
 
   RenderTests render_tests;
-  render_tests.RunTests();
-  return 0;
+  return_code += render_tests.RunTests();
+
+  return return_code;
 }

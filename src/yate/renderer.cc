@@ -55,6 +55,10 @@ StreamPos Renderer::Render(std::ostream &output) {
             lexer_->SetStreamPos(loop_end);
           } break;
           case Token::Tag::eLoopEnd: {
+            if (top_ == root_) {
+              throw std::runtime_error("Invalid Syntax: Unmatched 'LOOP_END'");
+            }
+
             current = lexer_->Scan();
             if (current.tag() != Token::Tag::eScriptEnd) {
               throw std::runtime_error(
@@ -63,14 +67,13 @@ StreamPos Renderer::Render(std::ostream &output) {
             return lexer_->CurrentStreamPos();
           } break;
           default:
-            throw std::runtime_error(
-                "Syntax Error: Unexpected token " + current.value());
+            throw std::runtime_error(CreateError(current));
             break;
         }
       } break;
       default:
-        throw std::runtime_error(
-            "Syntax Error: Unexpected token " + current.value());
+        // UNREACHABLE
+        throw std::runtime_error(CreateError(current));
         break;
     }
     current = lexer_->Scan();
@@ -84,7 +87,7 @@ std::tuple<Token, Token> Renderer::SetLoopFrame(const std::string &frame_id) {
     throw std::runtime_error(CreateError(array_id, Token::Tag::eIdentifier));
   }
   if (!top_->ContainsIterable(array_id.value())) {
-    throw std::runtime_error("Array " + array_id.value() + " is not defined");
+    throw std::runtime_error("Array '" + array_id.value() + "' is undefined");
   }
   auto item_id = lexer_->Scan(); // must be eIdentifier
   if (item_id.tag() != Token::Tag::eIdentifier) {
@@ -110,9 +113,16 @@ void Renderer::RestoreParentFrame() {
 }
 
 std::string Renderer::CreateError(const Token &token, Token::Tag expected) {
-  return "Invalid Syntax: Expected " + to_string(expected) + "'' but got '" +
-         to_string(token.tag()) +
-         (token.value().empty() ? "" : ("(" + token.value() + ")")) +
+  return "Invalid Syntax: Expected '" + to_string(expected) + "' but got '" +
+         to_string(token.tag()) + "' " +
+         (token.value().empty() ? "" : ("('" + token.value() + "')")) +
+         " at line " + std::to_string(token.line()) + " column " +
+         std::to_string(token.column());
+}
+
+std::string Renderer::CreateError(const Token &token) {
+  return "Invalid Syntax: Unexpected token '" + to_string(token.tag()) + "' " +
+         (token.value().empty() ? "" : ("('" + token.value() + "')")) +
          " at line " + std::to_string(token.line()) + " column " +
          std::to_string(token.column());
 }

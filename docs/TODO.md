@@ -6,7 +6,7 @@
 - [ ] Remove git remotes.
 - [ ] Fix problem with the string `{\\{` being ungeneretable.
 - [x] Change use of `assert()` to something more unit testing like.
-- [ ] Add failure tests for the `Renderer`.
+- [x] Add failure tests for the `Renderer`.
 - [ ] Create final public interface.
 - [x] Changing `streampos` in `Lexer` should update line and column too.
 - [ ] Test behavior with `std::cin`.
