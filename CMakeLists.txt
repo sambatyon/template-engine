@@ -44,6 +44,8 @@ if ("Ninja" STREQUAL ${CMAKE_GENERATOR})
   AddCXXFlagIfSupported(-fcolor-diagnostics COMPILER_SUPPORTS_fcolor-diagnostics)
 endif()
 
+enable_testing()
+
 # Project sources definitions.
 include_directories(include)
 add_subdirectory(src)
