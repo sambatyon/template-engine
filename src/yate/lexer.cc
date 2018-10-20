@@ -27,12 +27,14 @@ std::istream::char_type Lexer::ReadChar() {
   return current_;
 }
 
-std::streampos Lexer::CurrentStreamPos() const {
-  return istream_.tellg();
+StreamPos Lexer::CurrentStreamPos() const {
+  return StreamPos(istream_.tellg(), line_, column_);
 }
 
-void Lexer::SetStreamPos(std::streampos pos) {
-  istream_.seekg(pos, std::ios_base::beg);
+void Lexer::SetStreamPos(StreamPos pos) {
+  istream_.seekg(pos.position_, std::ios_base::beg);
+  line_ = pos.line_;
+  column_ = pos.column_;
 }
 
 
@@ -165,6 +167,27 @@ Token Lexer::ScanLiterate() {
   } else {
     return Token(Token::Tag::eEOF, "EOF", line, column);
   }
+}
+
+StreamPos::StreamPos() : StreamPos(0, 0, 0) {}
+
+StreamPos::StreamPos(std::streampos pos, std::uint32_t line, std::uint32_t col)
+    : position_(pos), line_(line), column_(col) {}
+
+StreamPos::StreamPos(const StreamPos &other)
+    : StreamPos(other.position_, other.line_, other.column_) {}
+
+StreamPos::StreamPos(StreamPos &&other)
+    : StreamPos(other.position_, other.line_, other.column_) {}
+
+StreamPos &StreamPos::operator=(const StreamPos &other) {
+  if (this == &other) {
+    return *this;
+  }
+  position_ = other.position_;
+  line_ = other.line_;
+  column_ = other.column_;
+  return *this;
 }
 
 } // namespace yate

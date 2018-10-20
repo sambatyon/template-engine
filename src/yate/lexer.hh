@@ -8,6 +8,8 @@
 
 namespace yate {
 
+class StreamPos;
+
 class Lexer {
  public:
   Lexer(std::istream &istream);
@@ -15,8 +17,8 @@ class Lexer {
 
   Token Scan();
 
-  std::streampos CurrentStreamPos() const;
-  void SetStreamPos(std::streampos pos);
+  StreamPos CurrentStreamPos() const;
+  void SetStreamPos(StreamPos pos);
 
  private:
   std::istream::char_type ReadChar();
@@ -33,6 +35,22 @@ class Lexer {
   bool initialized_; // TODO: Find a more elegant solution to this.
   std::uint64_t id_generator_;
   bool must_return_script_begin_;
+  std::uint32_t line_;
+  std::uint32_t column_;
+};
+
+class StreamPos {
+ public:
+  StreamPos();
+  StreamPos(std::streampos pos, std::uint32_t line, std::uint32_t col);
+  StreamPos(const StreamPos &other);
+  StreamPos(StreamPos &&other);
+  StreamPos &operator=(const StreamPos &other);
+  ~StreamPos() {}
+
+ private:
+  friend class Lexer;
+  std::streampos position_;
   std::uint32_t line_;
   std::uint32_t column_;
 };

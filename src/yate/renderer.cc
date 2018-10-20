@@ -19,7 +19,7 @@ void Renderer::Render(std::istream &input, std::ostream &output) {
   Render(output);
 }
 
-std::streampos Renderer::Render(std::ostream &output) {
+StreamPos Renderer::Render(std::ostream &output) {
   auto current = lexer_->Scan();
   while (current.tag() != Token::Tag::eEOF) {
     switch (current.tag()) {
@@ -44,7 +44,7 @@ std::streampos Renderer::Render(std::ostream &output) {
           case Token::Tag::eLoopBegin: {
             auto loop_variables = SetLoopFrame(current.value());
             auto loop_begin = lexer_->CurrentStreamPos();
-            std::streampos loop_end;
+            StreamPos loop_end;
             for (const auto &item :
                  top_->GetIterable(std::get<0>(loop_variables).value())) {
               top_->PutValue(std::get<1>(loop_variables).value(), item);

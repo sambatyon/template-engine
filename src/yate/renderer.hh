@@ -27,7 +27,7 @@ class Renderer {
   std::shared_ptr<Frame> root_;
   std::unique_ptr<Lexer> lexer_;
 
-  std::streampos Render(std::ostream &output);
+  StreamPos Render(std::ostream &output);
   std::tuple<Token, Token> SetLoopFrame(const std::string &frame_id);
   void RestoreParentFrame();
 
