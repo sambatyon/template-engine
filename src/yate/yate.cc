@@ -1,17 +1,16 @@
 #include <yate/yate.hh>
 
-#include <iostream>
+#include "renderer.hh"
 
 namespace yate {
 
-std::string hello(const std::string& world) {
-  return "hello " + world + '!';
-}
-
-Environment::Environment() {}
-
-std::ostream &Environment::Render(std::istream &input, std::ostream &output) {
-  return output;
+void Render(
+    const std::unordered_map<std::string, std::string> &values,
+    const std::unordered_map<std::string, std::vector<std::string>> &arrays,
+    std::istream &input,
+    std::ostream &output) {
+  Renderer renderer(values, arrays);
+  renderer.Render(input, output);
 }
 
 } // namespace yate
