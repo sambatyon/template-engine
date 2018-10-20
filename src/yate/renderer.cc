@@ -102,11 +102,11 @@ std::tuple<Token, Token> Renderer::SetLoopFrame(const std::string &frame_id) {
 }
 
 void Renderer::RestoreParentFrame() {
-  auto parent = top_->parent().lock();
-  if (parent == nullptr) {
-    throw std::runtime_error("Invalid Syntax, leaving parent frame");
+  if (top_->parent() == nullptr) {
+    // UNREACHABLE
+    throw std::runtime_error("root frame has no parent.");
   }
-  top_ = parent;
+  top_ = top_->parent();
 }
 
 std::string Renderer::CreateError(const Token &token, Token::Tag expected) {

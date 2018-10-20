@@ -32,6 +32,7 @@ class Renderer {
   void RestoreParentFrame();
 
   std::string CreateError(const Token &token, Token::Tag expected);
+  std::string CreateError(const Token &token);
 };
 
 } // namespace yate

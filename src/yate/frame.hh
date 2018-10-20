@@ -19,7 +19,7 @@ class Frame : public std::enable_shared_from_this<Frame> {
           iterable_values);
   ~Frame() {}
 
-  std::weak_ptr<Frame> parent() const { return parent_; }
+  std::shared_ptr<Frame> parent() const { return parent_; }
   std::string id() const { return id_; }
 
   std::string GetValue(const std::string& identifier) const;
