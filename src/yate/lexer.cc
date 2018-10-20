@@ -44,8 +44,7 @@ std::string Lexer::GenerateError(const std::string &message)
       std::to_string(column_) + ": " + message;
 }
 
-
-std::istream::char_type Lexer::ReadCompare(std::istream::char_type ch) {
+bool Lexer::ReadCompare(std::istream::char_type ch) {
   ReadChar();
   if (current_ == ch) {
     return true;

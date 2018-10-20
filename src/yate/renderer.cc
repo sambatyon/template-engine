@@ -4,6 +4,10 @@
 #include "lexer.hh"
 #include "token.hh"
 
+#include <string>
+#include <unordered_map>
+#include <vector>
+
 namespace yate {
 
 Renderer::Renderer(
@@ -24,8 +28,11 @@ StreamPos Renderer::Render(std::ostream &output) {
   while (current.tag() != Token::Tag::eEOF) {
     switch (current.tag()) {
       case Token::Tag::eNoOp: {
+        // Literate mode token, just copy everything to the output
+        // stream.
         output << current.value();
       } break;
+
       case Token::Tag::eScriptBegin: {
         current = lexer_->Scan();
         switch (current.tag()) {
@@ -34,26 +41,32 @@ StreamPos Renderer::Render(std::ostream &output) {
             if (!top_->ContainsValue(id)) {
               throw std::runtime_error("Identifier '" + id + "' is undefined");
             }
+
             output << top_->GetValue(id);
             current = lexer_->Scan();
+
             if (current.tag() != Token::Tag::eScriptEnd) {
               throw std::runtime_error(
                   CreateError(current, Token::Tag::eScriptEnd));
             }
           } break;
+
           case Token::Tag::eLoopBegin: {
             auto loop_variables = SetLoopFrame(current.value());
             auto loop_begin = lexer_->CurrentStreamPos();
             StreamPos loop_end;
+
             for (const auto &item :
                  top_->GetIterable(std::get<0>(loop_variables).value())) {
               top_->PutValue(std::get<1>(loop_variables).value(), item);
               loop_end = Render(output);
               lexer_->SetStreamPos(loop_begin);
             }
+
             RestoreParentFrame();
             lexer_->SetStreamPos(loop_end);
           } break;
+
           case Token::Tag::eLoopEnd: {
             if (top_ == root_) {
               throw std::runtime_error("Invalid Syntax: Unmatched 'LOOP_END'");
@@ -66,11 +79,13 @@ StreamPos Renderer::Render(std::ostream &output) {
             }
             return lexer_->CurrentStreamPos();
           } break;
+
           default:
             throw std::runtime_error(CreateError(current));
             break;
         }
       } break;
+
       default:
         // UNREACHABLE
         throw std::runtime_error(CreateError(current));
@@ -89,7 +104,7 @@ std::tuple<Token, Token> Renderer::SetLoopFrame(const std::string &frame_id) {
   if (!top_->ContainsIterable(array_id.value())) {
     throw std::runtime_error("Array '" + array_id.value() + "' is undefined");
   }
-  auto item_id = lexer_->Scan(); // must be eIdentifier
+  auto item_id = lexer_->Scan(); // must be eIdentifier does not need to exist
   if (item_id.tag() != Token::Tag::eIdentifier) {
     throw std::runtime_error(CreateError(item_id, Token::Tag::eIdentifier));
   }

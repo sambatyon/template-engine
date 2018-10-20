@@ -5,7 +5,6 @@
 #include <yate/renderer.hh>
 
 #include <sstream>
-#include <iostream>
 
 int RenderTests::RunTests() {
   int result = 0;
@@ -18,6 +17,8 @@ int RenderTests::RunTests() {
   return result;
 }
 
+// Initial render test, just checks simple strings are handled
+// properly.
 int RenderTests::TestFlatTemplate() {
   yate::Renderer renderer({}, {});
   std::stringstream input("Hello World");
@@ -27,6 +28,7 @@ int RenderTests::TestFlatTemplate() {
   return 0;
 }
 
+// Checks that strings are copied correctly into the rendered result.
 int RenderTests::TestSimpleTemplate() {
   yate::Renderer renderer({{"foo", "bar"}, {"weather", "sunny"}}, {});
   std::stringstream input(
@@ -45,6 +47,7 @@ int RenderTests::TestSimpleTemplate() {
   return 0;
 }
 
+// Tests simple use for loops in the template engine.
 int RenderTests::TestTemplateWithLoop() {
   yate::Renderer renderer(
       {
@@ -70,6 +73,7 @@ int RenderTests::TestTemplateWithLoop() {
   return 0;
 }
 
+// Tests proper handling of nested loops.
 int RenderTests::TestTemplateNestedLoop() {
   yate::Renderer renderer(
       {
@@ -119,6 +123,8 @@ int RenderTests::TestTemplateNestedLoop() {
   return 0;
 }
 
+// Tests that the engine has proper handling of symbol shadowing
+// inside loops.
 int RenderTests::TestTemplateVarialbleShadowing() {
   yate::Renderer renderer(
       {
@@ -141,6 +147,7 @@ int RenderTests::TestTemplateVarialbleShadowing() {
   return 0;
 }
 
+// Tests that input validation in templates is handled correctly.
 int RenderTests::TestRenderErrors() {
   yate::Renderer renderer(
       {

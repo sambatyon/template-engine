@@ -2,6 +2,9 @@
 
 #include "utils.hh"
 
+#include <memory>
+#include <string>
+
 namespace yate {
 
 Frame::Frame(std::shared_ptr<Frame> parent, std::string id)

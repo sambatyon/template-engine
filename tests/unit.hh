@@ -2,6 +2,7 @@
 
 #include <regex>
 #include <string>
+#include <iostream>
 
 #define TEST_EXPECT(expectation)                                          \
   do {                                                                    \

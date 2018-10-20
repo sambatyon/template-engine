@@ -129,6 +129,7 @@ int LexerTests::TestMultiTokenInput() {
   return 0;
 }
 
+// Tests different malformed inputs that ends up being lexer errors.
 int LexerTests::TestInputValidation() {
   {
     // Check that EOF inside script mode is an error.
