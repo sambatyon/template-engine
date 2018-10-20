@@ -1,5 +1,8 @@
 #pragma once
 
+#include <regex>
+#include <string>
+
 #define TEST_EXPECT(expectation)                                          \
   do {                                                                    \
     if (!(expectation)) {                                                 \
@@ -30,7 +33,7 @@
     }                                                                         \
   } while (false)
 
-#define TEST_EXPECT_EXCEPTION(expression)                                 \
+#define TEST_EXPECT_EXCEPTION1(expression)                                \
   do {                                                                    \
     bool __exception_occurred__ = false;                                  \
     try {                                                                 \
@@ -45,7 +48,7 @@
     }                                                                     \
   } while (false)
 
-#define TEST_EXPECT_EXCEPTION_TYPE(expression, exception_type)            \
+#define TEST_EXPECT_EXCEPTION2(expression, exception_type)                \
   do {                                                                    \
     bool __exception_occurred__ = false;                                  \
     try {                                                                 \
@@ -66,33 +69,67 @@
     }                                                                     \
   } while (false)
 
-#define TEST_EXPECT_EXCEPTION_MSG(expression, exception_type, message)        \
-  do {                                                                        \
-    bool __exception_occurred__ = false;                                      \
-    try {                                                                     \
-      (expression);                                                           \
-    } catch (const exception_type &e) {                                       \
-      __exception_occurred__ = true;                                          \
-      std::string msg = (message); \
-       if (e.what() != msg) {                      \
-        std::cerr << __func__ << " failed [" << __FILE__ << ":" << __LINE__   \
-                  << "] exception message " << e.what()                       \
-                  << " is not the same expected message \"" << msg << "\"\n"; \
-      }                                                                       \
-    } catch (...) {                                                           \
-      __exception_occurred__ = true;                                          \
-      std::cerr << __func__ << " failed [" << __FILE__ << ":" << __LINE__     \
-                << "] expression " << #expression                             \
-                << " throw unexpected exception.\n";                          \
-    }                                                                         \
-    if (!__exception_occurred__) {                                            \
-      std::cerr << __func__ << " failed [" << __FILE__ << ":" << __LINE__     \
-                << "] expression " << #expression                             \
-                << " was supposed to throw exception " << #exception_type     \
-                << '\n';                                                      \
-    }                                                                         \
+#define TEST_EXPECT_EXCEPTION3(expression, exception_type, message)         \
+  do {                                                                      \
+    bool __exception_occurred__ = false;                                    \
+    try {                                                                   \
+      (expression);                                                         \
+    } catch (const exception_type &e) {                                     \
+      __exception_occurred__ = true;                                        \
+      std::string msg = (message);                                          \
+      if (e.what() != msg) {                                                \
+        std::cerr << __func__ << " failed [" << __FILE__ << ":" << __LINE__ \
+                  << "] exception message \"" << e.what()                   \
+                  << "\" is not the same expected message \"" << msg        \
+                  << "\"\n";                                                \
+      }                                                                     \
+    } catch (...) {                                                         \
+      __exception_occurred__ = true;                                        \
+      std::cerr << __func__ << " failed [" << __FILE__ << ":" << __LINE__   \
+                << "] expression " << #expression                           \
+                << " throw unexpected exception.\n";                        \
+    }                                                                       \
+    if (!__exception_occurred__) {                                          \
+      std::cerr << __func__ << " failed [" << __FILE__ << ":" << __LINE__   \
+                << "] expression " << #expression                           \
+                << " was supposed to throw exception " << #exception_type   \
+                << '\n';                                                    \
+    }                                                                       \
   } while (false)
 
+#define TEST_EXPECT_EXCEPTION_REGEX(expression, exception_type, message)    \
+  do {                                                                      \
+    bool __exception_occurred__ = false;                                    \
+    try {                                                                   \
+      (expression);                                                         \
+    } catch (const exception_type &e) {                                     \
+      __exception_occurred__ = true;                                        \
+      std::regex rgx(message);                                              \
+      if (std::regex_match(e.what(), rgx)) {                                \
+        std::cerr << __func__ << " failed [" << __FILE__ << ":" << __LINE__ \
+                  << "] exception message \"" << e.what()                   \
+                  << "\" does not match expected message \"" << message     \
+                  << "\"\n";                                                \
+      }                                                                     \
+    } catch (...) {                                                         \
+      __exception_occurred__ = true;                                        \
+      std::cerr << __func__ << " failed [" << __FILE__ << ":" << __LINE__   \
+                << "] expression " << #expression                           \
+                << " throw unexpected exception.\n";                        \
+    }                                                                       \
+    if (!__exception_occurred__) {                                          \
+      std::cerr << __func__ << " failed [" << __FILE__ << ":" << __LINE__   \
+                << "] expression " << #expression                           \
+                << " was supposed to throw exception " << #exception_type   \
+                << '\n';                                                    \
+    }                                                                       \
+  } while (false)
+
+#define GET_MACRO(_1, _2, _3, NAME, ...) NAME
+
+#define TEST_EXPECT_EXCEPTION(...)                                       \
+  GET_MACRO(__VA_ARGS__, TEST_EXPECT_EXCEPTION3, TEST_EXPECT_EXCEPTION2) \
+  (__VA_ARGS__)
 
 #define TEST_ASSERT_EQ(expression, expected)                              \
   do {                                                                    \

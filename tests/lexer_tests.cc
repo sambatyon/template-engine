@@ -135,7 +135,7 @@ int LexerTests::TestInputValidation() {
     std::stringstream stream("{{");
     yate::Lexer lexer(stream);
     lexer.Scan();
-    TEST_EXPECT_EXCEPTION_MSG(
+    TEST_EXPECT_EXCEPTION(
         lexer.Scan(),
         std::runtime_error,
         "Error found in line 1 column 3: EOF found inside script mode.");
@@ -145,7 +145,7 @@ int LexerTests::TestInputValidation() {
     std::stringstream stream("{{#looper}}");
     yate::Lexer lexer(stream);
     lexer.Scan();
-    TEST_EXPECT_EXCEPTION_MSG(
+    TEST_EXPECT_EXCEPTION(
         lexer.Scan(),
         std::runtime_error,
         "Error found in line 1 column 8: Invalid keyword found");
@@ -155,7 +155,7 @@ int LexerTests::TestInputValidation() {
     std::stringstream stream("{{#while}}");
     yate::Lexer lexer(stream);
     lexer.Scan();
-    TEST_EXPECT_EXCEPTION_MSG(
+    TEST_EXPECT_EXCEPTION(
         lexer.Scan(),
         std::runtime_error,
         "Error found in line 1 column 4: Invalid keyword found.");
@@ -165,7 +165,7 @@ int LexerTests::TestInputValidation() {
     std::stringstream stream("{{/looper}}");
     yate::Lexer lexer(stream);
     lexer.Scan();
-    TEST_EXPECT_EXCEPTION_MSG(
+    TEST_EXPECT_EXCEPTION(
         lexer.Scan(),
         std::runtime_error,
         "Error found in line 1 column 8: Invalid keyword found.");
@@ -175,7 +175,7 @@ int LexerTests::TestInputValidation() {
     std::stringstream stream("{{/while}}");
     yate::Lexer lexer(stream);
     lexer.Scan();
-    TEST_EXPECT_EXCEPTION_MSG(
+    TEST_EXPECT_EXCEPTION(
         lexer.Scan(),
         std::runtime_error,
         "Error found in line 1 column 4: Invalid keyword found.");
@@ -187,7 +187,10 @@ int LexerTests::TestInputValidation() {
     yate::Lexer lexer(stream);
     lexer.Scan();
     lexer.Scan();
-    TEST_EXPECT_EXCEPTION_TYPE(lexer.Scan(), std::runtime_error);
+    TEST_EXPECT_EXCEPTION_REGEX(
+        lexer.Scan(),
+        std::runtime_error,
+        "Error found in line 1 column 9: Cannot recognize character '.'");
   }
   return 0;
 }
