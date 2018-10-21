@@ -1,5 +1,6 @@
 #include "lexer.hh"
 
+#include <cctype>
 #include <iostream>
 
 namespace yate {

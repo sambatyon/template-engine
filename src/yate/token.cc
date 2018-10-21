@@ -51,6 +51,7 @@ std::string to_string(Token::Tag tag) {
     case Token::Tag::eScriptEnd:
       return "SCRIPT_END";
   }
+  return "";
 }
 
 std::ostream &operator<<(std::ostream &stream, Token::Tag tag) {

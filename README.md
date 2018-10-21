@@ -181,6 +181,21 @@ make
 make test
 ```
 
+On Windows with Visual Studio 15:
+
+```bat
+cd %YATE_SRC_ROOT%
+mkdir build
+cd build
+cmake -G"Visual Studio 15 2017 Win64" ..
+REM Building can be done inside Visual Studio itself.
+```
+
+The code was tested in Ubuntu Linux 18.04, macOS 10 Mojave and MS Windows 10
+with Visual Studio 15 Community Edition. The latter required changes to the
+generated library (static library instead of shared) due to windows way of
+exporting symbols.
+
 The special target `test` run the unit tests. However it is preferably to run
 it outside as an standalone program (`template-engine-tests`) since ctest will
 ignore the output of the tests and at the moment the test unit system is not

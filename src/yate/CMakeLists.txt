@@ -10,7 +10,7 @@ include_directories(
   ../../include
 )
 
-add_library(yate SHARED
+add_library(yate STATIC
   ${template_hdr}
   ${template_src}
 )

@@ -128,9 +128,23 @@
 
 #define GET_MACRO(_1, _2, _3, NAME, ...) NAME
 
-#define TEST_EXPECT_EXCEPTION(...)                                       \
+#ifndef _MSC_VER
+
+#define TEST_EXPECT_EXCEPTION(...)                                      \
   GET_MACRO(__VA_ARGS__, TEST_EXPECT_EXCEPTION3, TEST_EXPECT_EXCEPTION2) \
   (__VA_ARGS__)
+
+#else // _MSC_VER
+
+// Workaround for Visual Studio bug where __VA_ARGS__ are expanded as a single
+// parameter.
+#define EXPAND(x) x
+#define TEST_EXPECT_EXCEPTION(...)                                            \
+  EXPAND(                                                                     \
+      GET_MACRO(__VA_ARGS__, TEST_EXPECT_EXCEPTION3, TEST_EXPECT_EXCEPTION2)( \
+          __VA_ARGS__))
+
+#endif // _MSC_VER
 
 #define TEST_ASSERT_EQ(expression, expected)                              \
   do {                                                                    \

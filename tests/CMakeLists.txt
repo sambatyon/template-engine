@@ -1,14 +1,17 @@
+file(GLOB_RECURSE yate_example_hdr *.hh)
+file(GLOB_RECURSE yate_example_src *.cc)
+
+source_group("Header Files" FILES ${yate_example_hdr})
+source_group("Source Files" FILES ${yate_example_src})
+
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/../include
   ${CMAKE_CURRENT_SOURCE_DIR}/../src
 )
 
 add_executable(${PROJECT_PREFIX}-tests
-  test_main.cc
-  lexer_tests.hh
-  lexer_tests.cc
-  render_tests.hh
-  render_tests.cc
+  ${yate_example_hdr}
+  ${yate_example_src}
 )
 
 target_link_libraries(${PROJECT_PREFIX}-tests yate)
