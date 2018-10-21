@@ -9,7 +9,7 @@ Token::Token(
     std::string value,
     std::uint32_t line,
     std::uint16_t col)
-    : tag_(tag), value_(value), line_(line), column_(col) {}
+    : tag_(tag), value_(std::move(value)), line_(line), column_(col) {}
 
 Token::Token(const Token &other)
     : tag_(other.tag_),
@@ -18,7 +18,7 @@ Token::Token(const Token &other)
       column_(other.column_) {}
 
 Token::Token(Token &&other)
-    : tag_(std::move(other.tag_)),
+    : tag_(other.tag_),
       value_(std::move(other.value_)),
       line_(other.line_),
       column_(other.column_) {}
