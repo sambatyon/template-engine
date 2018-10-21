@@ -55,6 +55,10 @@ other helper classes: The Token one as well as a Frame.
   past the loop end by moving the stream past the end of the loop and deletes
   the current topmost `Frame`.
 
+  Perhaps the one thing where the rendered can clearly be improved is by not
+  copies of the input parameters since the current design can lead to big memory
+  allocations and de-allocations. I noticed too late to fix the issue.
+
 The approach of jumping all over the stream makes the code in the `Renderer`
 much simpler, however it causes issues when the input stream is an interactive
 TTY. One solution would be to buffer read the input, although classes of the
@@ -63,9 +67,45 @@ better addressed.
 
 ### others
 
-1. https://youtu.be/PNRju6_yn3o?t=883
+1. A common patter found in the code base which may come as somewhat weird is
+   the way some classes constructors take copied parameters which are later
+   moved into its attributes (see [frame.hh](./src/yate/frame.hh)), for example:
+
+   ```c++
+   class Foo {
+    public:
+     Foo(Bar bar)
+
+    private:
+     Bar bar_;
+   }
+
+   Foo::Foo(Bar bar) : bar_(std::move(bar)) {}
+   ```
+
+   The pattern was taken from Nicolai Josuttis talk
+   [The nightmare of move semantics for trivial classes](https://youtu.be/PNRju6_yn3o?t=8830).
 
 ## API
+
+The usage of the library is very simple. There is only one include header
+[yate.hh](./include/yate/yate.hh) which defines a single function
+`yate::Render()`. This function takes four parameters as input:
+
+1. `values` of type `std::unordered_map<std::string, std::string>` which are
+   those values which are directly printable.
+1. `arrays` of type `std::unordered_map<std::string, std::vector<std::string>>`
+   which are those values which are used only inside loops. They cannot be
+   printed directly. This different use cases from `values` allows to reuse
+   the same name for an array and a value and no check is done to prevent this
+   from happening.
+1. `input`, a reference to an object of type `std::istream` which is the stream
+   from where the template would be read.
+1. `output`, a reference to an object of type `std::ostream` which is the stream
+   where the processed template will be streamed.
+
+An example of the intended used of the library can be found in
+[example_main.cc](./src/example/example_main.cc).
 
 ## Language
 
@@ -148,18 +188,20 @@ advanced enough to show as a failure when it actually fails.
 
 ## Code Structure
 
-- `include` directory contains all the headers that a client from the library
-  would need.
+- [`include`](./include/) directory contains all the headers that a client from
+  the library would need.
 
-- `src` contains a couple of subdirectories:
+- [`src`](./src/) contains a couple of subdirectories:
 
-  - `yate` contains the whole implementation of the template engine.
-  - `examples` subdirectory contains an example of how to use the library.
+  - [`yate`](./src/yate/) contains the whole implementation of the template
+    engine. Most of the code is located here.
+  - [`example`](./src/example) subdirectory contains an example of how to use
+    the library from and end user perspective.
 
-- `tests` subdirectory contains the unit tests for the library.
+- [`tests`](./tests/) subdirectory contains the unit tests for the library.
   The unit tests are rather comprehensive and it is recommended to look at
   them for an idea of what the library can and cannot do,
-  in particular `render_tests.cc`.
+  in particular [`render_tests.cc`](./tests/render_tests.cc).
 
 ## Known issues
 
@@ -170,3 +212,7 @@ advanced enough to show as a failure when it actually fails.
 
 1. Because we escape the string `{\{` to generate `{{` in the output, the string
    `{\{` became un-generable.
+
+1. Arrays and values can share the same name. Since I implemented only the loop
+   statement, I'm not so sure if this should be consider a bug or a feature. If
+   we consider it a bug, a simple check in `Frame` constructor should be enough.
