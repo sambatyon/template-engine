@@ -12,7 +12,7 @@ int RenderTests::RunTests() {
   result += TestSimpleTemplate();
   result += TestTemplateWithLoop();
   result += TestTemplateNestedLoop();
-  result += TestTemplateVarialbleShadowing();
+  result += TestTemplateVariableShadowing();
   result += TestRenderErrors();
   result += TestLoopWithEmptyArray();
   return result;
@@ -64,13 +64,13 @@ int RenderTests::TestTemplateWithLoop() {
         }
       });
   std::stringstream input(
-      "Hi, I'm {{foo}} and my hobies are {{#loop hobbies hobby}}\n- "
+      "Hi, I'm {{foo}} and my hobbies are {{#loop hobbies hobby}}\n- "
       "{{hobby}}{{/loop}}");
   std::stringstream output;
   renderer.Render(input, output);
   TEST_EXPECT_EQ(
       output.str(),
-      "Hi, I'm bar and my hobies are \n- baking\n- music\n- hiking");
+      "Hi, I'm bar and my hobbies are \n- baking\n- music\n- hiking");
   return 0;
 }
 
@@ -145,7 +145,7 @@ int RenderTests::TestTemplateNestedLoop() {
 
 // Tests that the engine has proper handling of symbol shadowing
 // inside loops.
-int RenderTests::TestTemplateVarialbleShadowing() {
+int RenderTests::TestTemplateVariableShadowing() {
   yate::Renderer renderer(
       {
         {"foo", "bar"}
