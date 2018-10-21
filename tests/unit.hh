@@ -14,24 +14,24 @@
 
 #define TEST_EXPECT_EQ(expression, expected)                              \
   do {                                                                    \
-    auto result = (expression);                                           \
-    auto expectation = (expected);                                        \
-    if (result != expectation) {                                          \
+    auto __result__ = (expression);                                       \
+    auto __expectation__ = (expected);                                    \
+    if (__result__ != __expectation__) {                                  \
       std::cerr << __func__ << " failed [" << __FILE__ << ":" << __LINE__ \
-                << "] expected " << expectation << " but got " << result  \
-                << '\n';                                                  \
+                << "] expected " << __expectation__ << " but got "        \
+                << __result__ << '\n';                                    \
     }                                                                     \
   } while (false)
 
-#define TEST_EXPECT_NEQ(expression, expected)                                 \
-  do {                                                                        \
-    auto result = (expression);                                               \
-    auto expectation = (expected);                                            \
-    if (result == expectation) {                                              \
-      std::cerr << __func__ << " failed [" << __FILE__ << ":" << __LINE__     \
-                << "] expression " << #expression << " evalued to " << result \
-                << '\n';                                                      \
-    }                                                                         \
+#define TEST_EXPECT_NEQ(expression, expected)                             \
+  do {                                                                    \
+    auto __result__ = (expression);                                       \
+    auto __expectation__ = (expected);                                    \
+    if (__result__ == __expectation__) {                                  \
+      std::cerr << __func__ << " failed [" << __FILE__ << ":" << __LINE__ \
+                << "] expression " << #expression << " evalued to "       \
+                << __result__ << '\n';                                    \
+    }                                                                     \
   } while (false)
 
 #define TEST_EXPECT_EXCEPTION1(expression)                                \
@@ -77,11 +77,11 @@
       (expression);                                                         \
     } catch (const exception_type &e) {                                     \
       __exception_occurred__ = true;                                        \
-      std::string msg = (message);                                          \
-      if (e.what() != msg) {                                                \
+      std::string __msg__ = (message);                                      \
+      if (e.what() != __msg__) {                                            \
         std::cerr << __func__ << " failed [" << __FILE__ << ":" << __LINE__ \
                   << "] exception message \"" << e.what()                   \
-                  << "\" is not the same expected message \"" << msg        \
+                  << "\" is not the same expected message \"" << __msg__    \
                   << "\"\n";                                                \
       }                                                                     \
     } catch (...) {                                                         \
@@ -105,8 +105,8 @@
       (expression);                                                         \
     } catch (const exception_type &e) {                                     \
       __exception_occurred__ = true;                                        \
-      std::regex rgx(message);                                              \
-      if (std::regex_match(e.what(), rgx)) {                                \
+      std::regex __rgx__(message);                                          \
+      if (std::regex_match(e.what(), __rgx__)) {                            \
         std::cerr << __func__ << " failed [" << __FILE__ << ":" << __LINE__ \
                   << "] exception message \"" << e.what()                   \
                   << "\" does not match expected message \"" << message     \
@@ -134,24 +134,24 @@
 
 #define TEST_ASSERT_EQ(expression, expected)                              \
   do {                                                                    \
-    auto result = (expression);                                           \
-    auto expectation = (expected);                                        \
-    if (result != expectation) {                                          \
+    auto __result__ = (expression);                                       \
+    auto __expectation__ = (expected);                                    \
+    if (__result__ != __expectation__) {                                  \
       std::cerr << __func__ << " failed [" << __FILE__ << ":" << __LINE__ \
-                << "] expected " << expectation << " but got " << result  \
-                << '\n';                                                  \
+                << "] expected " << __expectation__ << " but got "        \
+                << __result__ << '\n';                                    \
       return 1;                                                           \
     }                                                                     \
   } while (false)
 
-#define TEST_ASSET_NEQ(expression, expected)                                  \
-  do {                                                                        \
-    auto result = (expression);                                               \
-    auto expectation = (expected);                                            \
-    if (result == expectation) {                                              \
-      std::cerr << __func__ << " failed [" << __FILE__ << ":" << __LINE__     \
-                << "] expression " << #expression << " evalued to " << result \
-                << '\n';                                                      \
-      return 1;                                                               \
-    }                                                                         \
+#define TEST_ASSET_NEQ(expression, expected)                              \
+  do {                                                                    \
+    auto __result__ = (expression);                                       \
+    auto __expectation__ = (expected);                                    \
+    if (__result__ == __expectation__) {                                  \
+      std::cerr << __func__ << " failed [" << __FILE__ << ":" << __LINE__ \
+                << "] expression " << #expression << " evalued to "       \
+                << __result__ << '\n';                                    \
+      return 1;                                                           \
+    }                                                                     \
   } while (false)
