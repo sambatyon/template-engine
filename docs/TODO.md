@@ -1,8 +1,8 @@
 # TODO
-- [ ] Write Read me.
+- [x] Write Read me.
 - [x] Document Code.
 - [x] Tests.
-- [ ] Add documentation.
+- [x] Add documentation.
 - [ ] Remove git remotes.
 - [ ] Fix problem with the string `{\\{` being ungeneretable.
 - [x] Change use of `assert()` to something more unit testing like.
