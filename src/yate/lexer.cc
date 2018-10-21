@@ -27,23 +27,6 @@ std::istream::char_type Lexer::ReadChar() {
   return current_;
 }
 
-StreamPos Lexer::CurrentStreamPos() const {
-  return StreamPos(istream_.tellg(), line_, column_);
-}
-
-void Lexer::SetStreamPos(StreamPos pos) {
-  istream_.seekg(pos.position_, std::ios_base::beg);
-  line_ = pos.line_;
-  column_ = pos.column_;
-}
-
-
-std::string Lexer::GenerateError(const std::string &message)
-{
-  return "Error found in line " + std::to_string(line_) + " column " +
-      std::to_string(column_) + ": " + message;
-}
-
 bool Lexer::ReadCompare(std::istream::char_type ch) {
   ReadChar();
   if (current_ == ch) {
@@ -53,6 +36,7 @@ bool Lexer::ReadCompare(std::istream::char_type ch) {
 }
 
 Token Lexer::Scan() {
+  // Small workaround which prevents issuing EOF as the first token.
   if (initialized_ && current_ == '\0') {
     return Token(Token::Tag::eEOF, "", line_, column_);
   }
@@ -65,10 +49,16 @@ Token Lexer::Scan() {
 }
 
 Token Lexer::ScanScript() {
+  // In literate mode when the lexer encounters the `{{` it returns
+  // `NOOP` since `{{` where consumed it sets a flag so the next token
+  // emitted is SCRIPT_BEGIN. Alternatively those two characters could
+  // be put ack in the stream, but then this method would need to
+  // include code to parse that input too.
   if (must_return_script_begin_) {
     must_return_script_begin_ = false;
     return Token(Token::Tag::eScriptBegin, "{{", line_, column_-2);
   }
+
   // In script mode we discard all spaces
   while (std::isspace(current_)) {
     ReadChar();
@@ -166,6 +156,22 @@ Token Lexer::ScanLiterate() {
   } else {
     return Token(Token::Tag::eEOF, "EOF", line, column);
   }
+}
+
+StreamPos Lexer::CurrentStreamPos() const {
+  return StreamPos(istream_.tellg(), line_, column_);
+}
+
+void Lexer::SetStreamPos(StreamPos pos) {
+  istream_.seekg(pos.position_, std::ios_base::beg);
+  line_ = pos.line_;
+  column_ = pos.column_;
+}
+
+std::string Lexer::GenerateError(const std::string &message)
+{
+  return "Error found in line " + std::to_string(line_) + " column " +
+      std::to_string(column_) + ": " + message;
 }
 
 StreamPos::StreamPos() : StreamPos(0, 0, 0) {}

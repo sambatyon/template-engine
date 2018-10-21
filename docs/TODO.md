@@ -12,7 +12,7 @@
 - [x] Test behavior with `std::cin`. _WARNING_: It works as long as it is not
       interactive.
 - [x] Check includes.
-- [ ] Do one last code review of the whole thing.
+- [x] Do one last code review of the whole thing.
 - [x] Example applications.
 - [ ] Failed expectations don't cause test to fail (I haven't found a
       non obstructive way to achieve this).

@@ -35,6 +35,7 @@ StreamPos Renderer::Render(std::ostream &output) {
 
       case Token::Tag::eScriptBegin: {
         current = lexer_->Scan();
+
         switch (current.tag()) {
           case Token::Tag::eIdentifier: {
             std::string id = current.value();

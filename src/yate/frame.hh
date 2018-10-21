@@ -21,7 +21,7 @@ class Frame : public std::enable_shared_from_this<Frame> {
   /// This constructor does not set any symbols by default so any
   /// lookup will be deferred to `parent`.
   ///
-  /// @param parent The frame to withc symbol lookup will be deferred
+  /// @param parent The frame to witch symbol lookup will be deferred
   ///        to if the symbol itself is not found it the created
   ///        frame.
   /// @param id The frame id.
@@ -42,7 +42,7 @@ class Frame : public std::enable_shared_from_this<Frame> {
           iterable_values);
   ~Frame() {}
 
-  // Not default constructable, nor copiable nor movable.
+  // Not default constructable, nor copyable nor movable.
   Frame() = delete;
   Frame(const Frame &) = delete;
   Frame(const Frame &&) = delete;

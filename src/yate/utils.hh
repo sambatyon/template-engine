@@ -2,7 +2,7 @@
 
 /// Small helper function template which works as syntax candy for
 /// verification of element existance within a container.
-/// The container needs to support the `.find()` method which limists
+/// The container needs to support the `.find()` method which limits
 /// its use to `std::map`s and `std::set`s like containers.
 ///
 /// @param container The container to be searched for an item.

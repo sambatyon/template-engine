@@ -12,9 +12,9 @@ namespace yate {
 class Token {
  public:
   enum class Tag {
-    eEOF = 0,   /// Special token emmited when the input stream has been
+    eEOF = 0,   /// Special token emitted when the input stream has been
                 /// consumed.
-    eNoOp = 1,  /// Token representing a contigous ammount of text which won't
+    eNoOp = 1,  /// Token representing a contiguous amount of text which won't
                 /// be interpret
     eLoopBegin = 4,    /// The keyword `#loop`.
     eLoopEnd = 5,      /// The keyword `/loop`.
@@ -35,7 +35,7 @@ class Token {
   Token(Tag tag, std::string value, std::uint32_t line, std::uint16_t col);
   ~Token() {}
 
-  // Token is copiable and movable.
+  // Token is copyable and movable.
   Token(const Token &other);
   Token(Token &&other);
   Token &operator=(const Token&);
