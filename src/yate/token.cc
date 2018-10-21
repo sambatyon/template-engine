@@ -2,6 +2,8 @@
 
 namespace yate {
 
+Token::Token() : Token(Token::Tag::eEOF, "", 0, 0) {}
+
 Token::Token(
     Token::Tag tag,
     std::string value,

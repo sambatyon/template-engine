@@ -23,14 +23,16 @@ void Renderer::Render(std::istream &input, std::ostream &output) {
   Render(output);
 }
 
-StreamPos Renderer::Render(std::ostream &output) {
+StreamPos Renderer::Render(std::ostream &output, bool write_output) {
   auto current = lexer_->Scan();
   while (current.tag() != Token::Tag::eEOF) {
     switch (current.tag()) {
       case Token::Tag::eNoOp: {
         // Literate mode token, just copy everything to the output
         // stream.
-        output << current.value();
+        if (write_output) {
+          output << current.value();
+        }
       } break;
 
       case Token::Tag::eScriptBegin: {
@@ -43,7 +45,9 @@ StreamPos Renderer::Render(std::ostream &output) {
               throw std::runtime_error("Identifier '" + id + "' is undefined");
             }
 
-            output << top_->GetValue(id);
+            if (write_output) {
+              output << top_->GetValue(id);
+            }
             current = lexer_->Scan();
 
             if (current.tag() != Token::Tag::eScriptEnd) {
@@ -53,15 +57,22 @@ StreamPos Renderer::Render(std::ostream &output) {
           } break;
 
           case Token::Tag::eLoopBegin: {
-            auto loop_variables = SetLoopFrame(current.value());
+            Token array_name, item_name;
+            std::tie(array_name, item_name) = SetLoopFrame(current.value());
             auto loop_begin = lexer_->CurrentStreamPos();
             StreamPos loop_end;
 
-            for (const auto &item :
-                 top_->GetIterable(std::get<0>(loop_variables).value())) {
-              top_->PutValue(std::get<1>(loop_variables).value(), item);
-              loop_end = Render(output);
-              lexer_->SetStreamPos(loop_begin);
+            auto &array = top_->GetIterable(array_name.value());
+
+            if (!array.empty()) {
+              for (const auto &item : array) {
+                top_->PutValue(item_name.value(), item);
+                loop_end = Render(output, write_output);
+                lexer_->SetStreamPos(loop_begin);
+              }
+            } else {
+                top_->PutValue(item_name.value(), "");
+              loop_end = Render(output, false);
             }
 
             RestoreParentFrame();

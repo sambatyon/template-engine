@@ -9,4 +9,5 @@ struct RenderTests {
   int TestTemplateNestedLoop();
   int TestTemplateVarialbleShadowing();
   int TestRenderErrors();
+  int TestLoopWithEmptyArray();
 };

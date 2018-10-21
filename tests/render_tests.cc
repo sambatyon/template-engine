@@ -14,6 +14,7 @@ int RenderTests::RunTests() {
   result += TestTemplateNestedLoop();
   result += TestTemplateVarialbleShadowing();
   result += TestRenderErrors();
+  result += TestLoopWithEmptyArray();
   return result;
 }
 
@@ -70,6 +71,25 @@ int RenderTests::TestTemplateWithLoop() {
   TEST_EXPECT_EQ(
       output.str(),
       "Hi, I'm bar and my hobies are \n- baking\n- music\n- hiking");
+  return 0;
+}
+
+// Tests behavior when a loop uses an empty array.
+int RenderTests::TestLoopWithEmptyArray() {
+  yate::Renderer renderer(
+      {
+        {"symbol", "value"}
+      },
+      {
+        {"array", {}}
+      });
+
+  std::stringstream input(
+      "{{symbol}}{{#loop array item}}{{symbol}} {{item}}{{/loop}}{{symbol}}");
+  std::stringstream output;
+  renderer.Render(input, output);
+
+  TEST_EXPECT_EQ(output.str(), "valuevalue");
   return 0;
 }
 

@@ -16,3 +16,4 @@
 - [x] Example applications.
 - [ ] Failed expectations don't cause test to fail (I haven't found a
       non obstructive way to achieve this).
+- [x] Test with empty loop.

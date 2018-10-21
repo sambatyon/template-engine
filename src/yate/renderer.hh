@@ -50,9 +50,12 @@ class Renderer {
   ///
   /// @param output The stream where the rendered output will be
   ///        stored.
+  /// @param write_output A boolean indicating whether the parsed
+  ///        elements should be written. Useful with empty loops
+  ///        and when implemented an `#if` keyword.
   /// @return The position of the input stream at the moment this
   ///        method returns.
-  StreamPos Render(std::ostream &output);
+  StreamPos Render(std::ostream &output, bool write_output = true);
 
   /// Creates a new Frame and sets it as the new top Frame. It returns
   /// a tuple containing the identifiers to be used to iterate over

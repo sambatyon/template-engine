@@ -25,6 +25,10 @@ class Token {
                        /// script modes.
   };
 
+  /// Default constructor, it is a shortcut for the equivalent:
+  /// `Token(eEOF, "", 0, 0)`.
+  Token();
+
   /// Initializes a token with the given type (`tag`), `value` and its
   /// position in the stream.
   ///
