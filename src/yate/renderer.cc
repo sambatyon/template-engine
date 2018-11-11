@@ -64,7 +64,7 @@ StreamPos Renderer::Render(std::ostream &output, bool write_output) {
 
             auto &array = top_->GetIterable(array_name.value());
 
-            if (!array.empty()) {
+            if (write_output && !array.empty()) {
               for (const auto &item : array) {
                 top_->PutValue(item_name.value(), item);
                 loop_end = Render(output, write_output);
